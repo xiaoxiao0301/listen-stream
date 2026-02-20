@@ -1,0 +1,628 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "list": [
+            {
+                "albumID": 60671,
+                "albumMID": "0024bjiL2aocxT",
+                "albumName": "十一月的萧邦",
+                "albumName_hilight": "十一月的萧邦",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M0000024bjiL2aocxT_5.jpg",
+                "catch_song": "",
+                "docid": "10430596676454347966",
+                "publicTime": "2005-11-01",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 12,
+                "type": 0
+            },
+            {
+                "albumID": 8220,
+                "albumMID": "000MkMni19ClKG",
+                "albumName": "叶惠美",
+                "albumName_hilight": "叶惠美",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000000MkMni19ClKG_5.jpg",
+                "catch_song": "",
+                "docid": "12255898198876076341",
+                "publicTime": "2003-07-31",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 11,
+                "type": 0
+            },
+            {
+                "albumID": 20612,
+                "albumMID": "003DFRzD192KKD",
+                "albumName": "七里香",
+                "albumName_hilight": "七里香",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000003DFRzD192KKD_2.jpg",
+                "catch_song": "",
+                "docid": "17966418953523318396",
+                "publicTime": "2004-08-03",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 36062,
+                "albumMID": "002Neh8l0uciQZ",
+                "albumName": "魔杰座",
+                "albumName_hilight": "魔杰座",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000002Neh8l0uciQZ_3.jpg",
+                "catch_song": "",
+                "docid": "16248315236598555808",
+                "publicTime": "2008-10-15",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 11,
+                "type": 0
+            },
+            {
+                "albumID": 8217,
+                "albumMID": "000I5jJB3blWeN",
+                "albumName": "范特西",
+                "albumName_hilight": "范特西",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000000I5jJB3blWeN_3.jpg",
+                "catch_song": "",
+                "docid": "9955806126048031202",
+                "publicTime": "2001-09-14",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 79852715,
+                "albumMID": "004Bux530GytNj",
+                "albumName": "恒星不忘 Forever Forever",
+                "albumName_hilight": "恒星不忘 Forever Forever",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000004Bux530GytNj_2.jpg",
+                "catch_song": "",
+                "docid": "1364904061027684833",
+                "publicTime": "2025-12-05",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    },
+                    {
+                        "id": 4944,
+                        "mid": "004VN9Ui1Omv94",
+                        "name": "言承旭",
+                        "pmid": "",
+                        "title": "言承旭",
+                        "type": 0,
+                        "uin": 0
+                    },
+                    {
+                        "id": 266,
+                        "mid": "001Ue7bB0Bjbe8",
+                        "name": "吴建豪",
+                        "pmid": "",
+                        "title": "吴建豪",
+                        "type": 0,
+                        "uin": 0
+                    },
+                    {
+                        "id": 270,
+                        "mid": "000ICvx62mc19U",
+                        "name": "周渝民",
+                        "pmid": "",
+                        "title": "周渝民",
+                        "type": 0,
+                        "uin": 0
+                    },
+                    {
+                        "id": 6617,
+                        "mid": "0040EhGd2lkffO",
+                        "name": "五月天 阿信",
+                        "pmid": "",
+                        "title": "五月天 阿信",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 1,
+                "type": 0
+            },
+            {
+                "albumID": 8218,
+                "albumMID": "000f01724fd7TH",
+                "albumName": "Jay",
+                "albumName_hilight": "Jay",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000000f01724fd7TH_2.jpg",
+                "catch_song": "",
+                "docid": "816538268937838610",
+                "publicTime": "2000-11-07",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 33021,
+                "albumMID": "002eFUFm2XYZ7z",
+                "albumName": "我很忙",
+                "albumName_hilight": "我很忙",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000002eFUFm2XYZ7z_3.jpg",
+                "catch_song": "",
+                "docid": "10480804403347573512",
+                "publicTime": "2007-11-02",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 8219,
+                "albumMID": "004MGitN0zEHpb",
+                "albumName": "八度空间",
+                "albumName_hilight": "八度空间",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000004MGitN0zEHpb_3.jpg",
+                "catch_song": "",
+                "docid": "6833477954614110246",
+                "publicTime": "2002-07-18",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 13004,
+                "albumMID": "002jLGWe16Tf1H",
+                "albumName": "依然范特西",
+                "albumName_hilight": "依然范特西",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000002jLGWe16Tf1H_1.jpg",
+                "catch_song": "",
+                "docid": "6996947755902608032",
+                "publicTime": "2006-09-05",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 56705,
+                "albumMID": "000bviBl4FjTpO",
+                "albumName": "跨时代",
+                "albumName_hilight": "跨时代",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000000bviBl4FjTpO_2.jpg",
+                "catch_song": "",
+                "docid": "16081572531590806451",
+                "publicTime": "2010-05-18",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 11,
+                "type": 0
+            },
+            {
+                "albumID": 28791467,
+                "albumMID": "0042cH172YJ0mz",
+                "albumName": "最伟大的作品",
+                "albumName_hilight": "最伟大的作品",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M0000042cH172YJ0mz_3.jpg",
+                "catch_song": "",
+                "docid": "1256373993680121079",
+                "publicTime": "2022-07-15",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 12,
+                "type": 0
+            },
+            {
+                "albumID": 194021,
+                "albumMID": "003Ow85E3pnoqi",
+                "albumName": "十二新作",
+                "albumName_hilight": "十二新作",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000003Ow85E3pnoqi_1.jpg",
+                "catch_song": "",
+                "docid": "1193767663896547969",
+                "publicTime": "2012-12-28",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 12,
+                "type": 0
+            },
+            {
+                "albumID": 1458791,
+                "albumMID": "003RMaRI1iFoYd",
+                "albumName": "周杰伦的床边故事",
+                "albumName_hilight": "<em>周杰伦</em>的床边故事",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000003RMaRI1iFoYd_1.jpg",
+                "catch_song": "",
+                "docid": "3609733955036397641",
+                "publicTime": "2016-06-24",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 10,
+                "type": 0
+            },
+            {
+                "albumID": 852856,
+                "albumMID": "001uqejs3d6EID",
+                "albumName": "哎呦，不错哦",
+                "albumName_hilight": "哎呦，不错哦",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000001uqejs3d6EID_2.jpg",
+                "catch_song": "",
+                "docid": "18254326690884887182",
+                "publicTime": "2014-12-26",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 12,
+                "type": 0
+            },
+            {
+                "albumID": 85650,
+                "albumMID": "003KNcyk0t3mwg",
+                "albumName": "惊叹号",
+                "albumName_hilight": "惊叹号",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000003KNcyk0t3mwg_1.jpg",
+                "catch_song": "",
+                "docid": "17802275310372315864",
+                "publicTime": "2011-11-11",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 11,
+                "type": 0
+            },
+            {
+                "albumID": 32611,
+                "albumMID": "001UP7mW458ipG",
+                "albumName": "不能说的秘密 电影原声带",
+                "albumName_hilight": "不能说的秘密 电影原声带",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000001UP7mW458ipG_4.jpg",
+                "catch_song": "",
+                "docid": "12761715837335279931",
+                "publicTime": "2007-08-13",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 24,
+                "type": 0
+            },
+            {
+                "albumID": 8221,
+                "albumMID": "001BGzMs369FzU",
+                "albumName": "寻找周杰伦",
+                "albumName_hilight": "寻找<em>周杰伦</em>",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000001BGzMs369FzU_4.jpg",
+                "catch_song": "",
+                "docid": "7430627145080789396",
+                "publicTime": "2003-11-13",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 4,
+                "type": 0
+            },
+            {
+                "albumID": 14323,
+                "albumMID": "0032ezFm3F53yO",
+                "albumName": "周杰伦 2004 无与伦比 演唱会 Live CD",
+                "albumName_hilight": "<em>周杰伦</em> 2004 无与伦比 演唱会 Live CD",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M0000032ezFm3F53yO_3.jpg",
+                "catch_song": "",
+                "docid": "16559153109373752753",
+                "publicTime": "2005-01-20",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 25,
+                "type": 0
+            },
+            {
+                "albumID": 9040723,
+                "albumMID": "004fXSyj3bWTMN",
+                "albumName": "周杰伦地表最强世界巡回演唱会",
+                "albumName_hilight": "<em>周杰伦</em>地表最强世界巡回演唱会",
+                "albumPic": "http://y.gtimg.cn/music/photo_new/T002R180x180M000004fXSyj3bWTMN_1.jpg",
+                "catch_song": "",
+                "docid": "3673424334421585609",
+                "publicTime": "2019-11-01",
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "周杰伦",
+                "singerTransName": "",
+                "singerTransName_hilight": "",
+                "singer_list": [
+                    {
+                        "id": 4558,
+                        "mid": "0025NhlN2yWrP4",
+                        "name": "周杰伦",
+                        "pmid": "",
+                        "title": "周杰伦",
+                        "type": 0,
+                        "uin": 0
+                    }
+                ],
+                "song_count": 25,
+                "type": 0
+            }
+        ],
+        "page": 1,
+        "size": 20,
+        "total": 493,
+        "key": "周杰伦"
+    }
+}

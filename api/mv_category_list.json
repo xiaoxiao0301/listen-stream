@@ -1,0 +1,343 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "list": [
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 219,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2315353,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101001EQKJI0uXvPY.jpg",
+                "playcnt": 420,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 4589723,
+                        "mid": "000wY2Iy43Hp6I",
+                        "name": "Beren",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002PVWDN3kBtTe_0.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "CapitaliZoo",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "001EQKJI0uXvPY"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 108,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 2047,
+                "mvid": 2333990,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101001ZfA7W1FgdRX.jpg",
+                "playcnt": 11,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 264175,
+                        "mid": "001fLK3A47bK5t",
+                        "name": "El Jhota",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000001fLK3A47bK5t_2.jpg"
+                    },
+                    {
+                        "id": 5738068,
+                        "mid": "001qx8Np465URL",
+                        "name": "JC el Diamante",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002knSQ01Ts1vS_0.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Un Palo",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "001ZfA7W1FgdRX"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 188,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2336918,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M1010016Zi2B4Gig7D.jpg",
+                "playcnt": 3,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 10207,
+                        "mid": "0009DnKA4BMIFl",
+                        "name": "Martinho Da Vila",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000009DnKA4BMIFl_3.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Bom Dia Minha Flor (Áudio Oficial)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "0016Zi2B4Gig7D"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 200,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2337006,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101003qNTtH21A3wt.jpg",
+                "playcnt": 1,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 226333,
+                        "mid": "00311jK33J3ZbU",
+                        "name": "Bezerra Da Silva",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M00000311jK33J3ZbU_3.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Samba Manifesto (Áudio Oficial)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "003qNTtH21A3wt"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 157,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2337007,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101003WUqxK495xct.jpg",
+                "playcnt": 2,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 67556,
+                        "mid": "002JrPI14KLeZf",
+                        "name": "Luiz Gonzaga",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002JrPI14KLeZf_4.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "O Andarilho (Áudio Oficial)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "003WUqxK495xct"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 242,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2337245,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101003Ni2LB3UE0wd.jpg",
+                "playcnt": 113,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 4645128,
+                        "mid": "002eSniy0RPvfk",
+                        "name": "준성",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002eSniy0RPvfk_4.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "그대 위로가 필요하다 느낄 때(When You Need Comfort)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "003Ni2LB3UE0wd"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 207,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2338482,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101001hLrZm4CfJJ0.jpg",
+                "playcnt": 10,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 6440740,
+                        "mid": "0018CT0Z3x4QOJ",
+                        "name": "La Banana Stereo",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002knSQ01Ts1vS_0.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Chicas Dulces",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "001hLrZm4CfJJ0"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 240,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2338541,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101003gs7iQ1wZLtl.jpg",
+                "playcnt": 12,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 2156787,
+                        "mid": "001PKmGT4GhgIZ",
+                        "name": "Acies Quartett",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000001PKmGT4GhgIZ_2.jpg"
+                    },
+                    {
+                        "id": 19378038,
+                        "mid": "002mNyuB1ku5Eq",
+                        "name": "Simon Kravos",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000003GPzZz2b7OZj_0.jpg"
+                    },
+                    {
+                        "id": 6977856,
+                        "mid": "0001b5Pu3BMC3f",
+                        "name": "Luka Sulic",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000001b5Pu3BMC3f_2.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Czardas (Live at Union Chapel)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "003gs7iQ1wZLtl"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 326,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2338787,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101000Z2pTQ43zXYU.jpg",
+                "playcnt": 2,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 7563388,
+                        "mid": "004JV8di3odVqS",
+                        "name": "Randall Scotting",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002knSQ01Ts1vS_0.jpg"
+                    },
+                    {
+                        "id": 16933,
+                        "mid": "002GqXGi1aXO9w",
+                        "name": "Academy Of Ancient Music",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002GqXGi1aXO9w_2.jpg"
+                    },
+                    {
+                        "id": 729296,
+                        "mid": "003V6IcT4UJ8io",
+                        "name": "Mary Bevan",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000003V6IcT4UJ8io_1.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Amadigi, HWV 11: Crudel tu non farai",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "000Z2pTQ43zXYU"
+            },
+            {
+                "comment_cnt": 0,
+                "diff": 0,
+                "duration": 255,
+                "has_fav": 0,
+                "has_star": 0,
+                "mv_switch": 1903,
+                "mvid": 2338889,
+                "picurl": "http://y.gtimg.cn/music/photo_new/T015R640x360M101000OO7JC1N96hp.jpg",
+                "playcnt": 9,
+                "pubdate": 1770825600,
+                "score": 0,
+                "singers": [
+                    {
+                        "id": 14202,
+                        "mid": "004PsjIP0YOyys",
+                        "name": "Gal Costa",
+                        "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M000004PsjIP0YOyys_3.jpg"
+                    }
+                ],
+                "star_cnt": 0,
+                "subtitle": "",
+                "title": "Nada Mais(Lately) (Áudio Oficial)",
+                "uploader": {
+                    "enc_uin": "",
+                    "headurl": "",
+                    "nick": ""
+                },
+                "vid": "000OO7JC1N96hp"
+            }
+        ],
+        "total": 1000,
+        "area": 15,
+        "version": 7,
+        "page": 1,
+        "size": 10
+    }
+}

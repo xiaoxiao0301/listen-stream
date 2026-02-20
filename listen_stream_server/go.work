@@ -1,0 +1,9 @@
+go 1.23.0
+
+use (
+	./shared/go
+	./auth-svc
+	./proxy-svc
+	./sync-svc
+	./admin-svc
+)

@@ -1,0 +1,144 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "list": [
+            {
+                "albumNum": 43,
+                "concern_status": 0,
+                "docid": "16713330030960059468",
+                "mvNum": 10234,
+                "singerID": 4558,
+                "singerMID": "0025NhlN2yWrP4",
+                "singerName": "周杰伦",
+                "singerName_hilight": "<em>周杰伦</em>",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000025NhlN2yWrP4_10.jpg",
+                "songNum": 998
+            },
+            {
+                "albumNum": 33,
+                "concern_status": 0,
+                "docid": "12381921065805603337",
+                "mvNum": 156,
+                "singerID": 7311,
+                "singerMID": "00489l610k75Z2",
+                "singerName": "Lara梁心颐",
+                "singerName_hilight": "Lara梁心颐",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M00000489l610k75Z2_4.jpg",
+                "songNum": 179
+            },
+            {
+                "albumNum": 57,
+                "concern_status": 0,
+                "docid": "11601649000076336488",
+                "mvNum": 790,
+                "singerID": 141,
+                "singerMID": "003JGrNQ3RjelA",
+                "singerName": "张惠妹",
+                "singerName_hilight": "张惠妹",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000003JGrNQ3RjelA_4.jpg",
+                "songNum": 670
+            },
+            {
+                "albumNum": 1,
+                "concern_status": 0,
+                "docid": "13453580013220726544",
+                "mvNum": 7,
+                "singerID": 157261,
+                "singerMID": "0020KRM719dcJ5",
+                "singerName": "潘儿",
+                "singerName_hilight": "潘儿",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000020KRM719dcJ5_3.jpg",
+                "songNum": 12
+            },
+            {
+                "albumNum": 1,
+                "concern_status": 0,
+                "docid": "13782023601083142048",
+                "mvNum": 2,
+                "singerID": 16598583,
+                "singerMID": "001xUzVt3zMzd9",
+                "singerName": "周杰伦的小雨",
+                "singerName_hilight": "<em>周杰伦</em>的小雨",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000001xUzVt3zMzd9_4.jpg",
+                "songNum": 1
+            },
+            {
+                "albumNum": 0,
+                "concern_status": 0,
+                "docid": "2177124290601825356",
+                "mvNum": 2,
+                "singerID": 1561248,
+                "singerMID": "00203xA13apUJN",
+                "singerName": "周杰伦战队",
+                "singerName_hilight": "<em>周杰伦</em>战队",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M00000203xA13apUJN_4.jpg",
+                "songNum": 3
+            },
+            {
+                "albumNum": 2,
+                "concern_status": 0,
+                "docid": "14032925834233212688",
+                "mvNum": 0,
+                "singerID": 5854200,
+                "singerMID": "002Z6Jyg3kEnmK",
+                "singerName": "周杰伦吧",
+                "singerName_hilight": "<em>周杰伦</em>吧",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002Z6Jyg3kEnmK_4.jpg",
+                "songNum": 3
+            },
+            {
+                "albumNum": 39,
+                "concern_status": 0,
+                "docid": "850766715584880492",
+                "mvNum": 1019,
+                "singerID": 4331423,
+                "singerMID": "004Frj3P4Emgu1",
+                "singerName": "周杰伦微博台",
+                "singerName_hilight": "<em>周杰伦</em>微博台",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000004Frj3P4Emgu1_11.jpg",
+                "songNum": 1137
+            },
+            {
+                "albumNum": 48,
+                "concern_status": 0,
+                "docid": "14394781206556291657",
+                "mvNum": 4,
+                "singerID": 1518532,
+                "singerMID": "000VmTtj2d2mnM",
+                "singerName": "达布希勒图",
+                "singerName_hilight": "达布希勒图",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000000VmTtj2d2mnM_3.jpg",
+                "songNum": 140
+            },
+            {
+                "albumNum": 3,
+                "concern_status": 0,
+                "docid": "16410159452589574413",
+                "mvNum": 43,
+                "singerID": 13886,
+                "singerMID": "002Z462D2amcz9",
+                "singerName": "杨瑞代",
+                "singerName_hilight": "杨瑞代",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M000002Z462D2amcz9_2.jpg",
+                "songNum": 47
+            },
+            {
+                "albumNum": 112,
+                "concern_status": 0,
+                "docid": "7611874513503327764",
+                "mvNum": 471,
+                "singerID": 131,
+                "singerMID": "0040MELG3TS8OW",
+                "singerName": "费玉清",
+                "singerName_hilight": "费玉清",
+                "singerPic": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000040MELG3TS8OW_3.jpg",
+                "songNum": 1022
+            }
+        ],
+        "page": 1,
+        "size": 20,
+        "total": 11,
+        "key": "周杰伦"
+    }
+}

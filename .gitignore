@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# listen-stream — root .gitignore
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Environment / Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example          # 保留示例文件
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+listen_stream_server/vendor/
+listen_stream_server/**/*.exe
+listen_stream_server/**/*.test
+listen_stream_server/**/*.out
+# compiled binaries（multi-stage Docker 不会产生，本地 go build 会）
+listen_stream_server/bin/
+
+# ── Flutter ───────────────────────────────────────────────────────────────────
+listen_stream_client/.dart_tool/
+listen_stream_client/.flutter-plugins
+listen_stream_client/.flutter-plugins-dependencies
+listen_stream_client/.pub-cache/
+listen_stream_client/.pub/
+listen_stream_client/build/
+listen_stream_client/ios/Pods/
+listen_stream_client/ios/.symlinks/
+listen_stream_client/android/.gradle/
+listen_stream_client/android/local.properties
+listen_stream_client/android/key.properties
+listen_stream_client/**/*.g.dart        # build_runner 生成文件（Isar）
+listen_stream_client/**/*.freezed.dart  # freezed 生成文件（如有）
+listen_stream_client/.metadata
+
+# ── Admin frontend（Vite+React 脚手架后生效）─────────────────────────────────
+listen_stream_admin/node_modules/
+listen_stream_admin/dist/
+listen_stream_admin/.env.local
+listen_stream_admin/.env.*.local
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# 本地 docker volume 数据不进仓库（volume 定义在 docker-compose.yml 里）
+postgres-data/
+redis-data/

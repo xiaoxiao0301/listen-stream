@@ -1,0 +1,32 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "info": {
+            "msg": "",
+            "desc": "",
+            "video_switch": 1807,
+            "playcnt": 182001,
+            "isfav": 0,
+            "singers": [
+                {
+                    "id": 4558,
+                    "mid": "0025NhlN2yWrP4",
+                    "name": "周杰伦",
+                    "picurl": "http://y.gtimg.cn/music/photo_new/T001R150x150M0000025NhlN2yWrP4_10.jpg",
+                    "pic_mid": "0025NhlN2yWrP4_10",
+                    "grade": 1
+                }
+            ],
+            "gmid": "010t6cfK1di5Xc",
+            "name": "说好不哭 (with 五月天阿信) (KTV版)",
+            "duration": 231,
+            "pubdate": 1569340800,
+            "vid": "d0032k98yoy",
+            "type": 0,
+            "sid": 1570556,
+            "cover_pic": "http://y.gtimg.cn/music/photo_new/T015R640x360M0000010YioO4ISvg2.jpg"
+        },
+        "recommend": []
+    }
+}

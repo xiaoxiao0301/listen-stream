@@ -1,0 +1,2299 @@
+openapi: 3.1.0
+info:
+  title: Listen Stream API
+  version: 1.0.0
+  description: |
+    Listen Stream 后端全路由契约规范。
+    - 所有时间字段均为 ISO 8601 UTC 字符串（`2026-02-20T12:00:00Z`）
+    - 所有列表接口统一分页格式：`{ data, total, page, size }`
+    - Proxy 路由的 `data` 字段内容透传自第三方 API，枚举值不在本规范中固化
+    - 错误响应统一格式：`{ code: string, message?: string }`
+
+servers:
+  - url: http://localhost:8001
+    description: auth-svc (开发)
+  - url: http://localhost:8002
+    description: proxy-svc (开发)
+  - url: http://localhost:8003
+    description: sync-svc (开发)
+  - url: http://localhost:8004
+    description: admin-svc (开发)
+
+# ─────────────────────────────────────────────
+# Security
+# ─────────────────────────────────────────────
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT，Claims 中须含 `aud` 字段。
+        - 用户接口：`aud = ["user"]`，由 auth-svc 签发，使用 USER_JWT_SECRET 验证。
+        - 管理员接口：`aud = ["admin"]`，由 admin-svc 签发，使用 ADMIN_JWT_SECRET 验证。
+
+  # ─────────────────────────────────────────────
+  # Reusable schemas
+  # ─────────────────────────────────────────────
+  schemas:
+
+    # ── Error ──
+    ErrorResponse:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: 机器可读错误码
+        message:
+          type: string
+          description: 可选的人类可读描述
+
+    # ── Pagination ──
+    PaginationMeta:
+      type: object
+      required: [total, page, size]
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+
+    # ── Auth ──
+    UserTokenResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn, deviceId]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Access Token 有效期（秒）
+        deviceId:
+          type: string
+          description: 设备唯一 ID（UUID v4），客户端须持久化
+
+    TokenRefreshResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+
+    # ── Proxy (third-party envelope) ──
+    ThirdPartyEnvelope:
+      type: object
+      required: [code, message, data]
+      properties:
+        code:
+          type: integer
+          example: 1
+          description: 第三方 API 状态码，1 = 成功
+        message:
+          type: string
+          example: "Success"
+        data:
+          description: 第三方 API 返回的原始数据，结构见 api/*.json 样例文件
+
+    # ── Favorites ──
+    FavoriteType:
+      type: string
+      enum: [song, album, singer]
+
+    Favorite:
+      type: object
+      required: [id, type, targetId, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/FavoriteType'
+        targetId:
+          type: string
+          description: 第三方 song_mid / album_mid / singer_mid
+        createdAt:
+          type: string
+          format: date-time
+
+    FavoriteListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMeta'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Favorite'
+
+    # ── History ──
+    HistoryEntry:
+      type: object
+      required: [id, songMid, progress, playedAt]
+      properties:
+        id:
+          type: string
+        songMid:
+          type: string
+        progress:
+          type: integer
+          description: 播放进度（秒）
+          minimum: 0
+        playedAt:
+          type: string
+          format: date-time
+
+    HistoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMeta'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/HistoryEntry'
+
+    # ── Playlists ──
+    UserPlaylist:
+      type: object
+      required: [id, name, songCount, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        songCount:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PlaylistSong:
+      type: object
+      required: [songMid, sortOrder, addedAt]
+      properties:
+        songMid:
+          type: string
+        sortOrder:
+          type: integer
+          minimum: 0
+        addedAt:
+          type: string
+          format: date-time
+
+    PlaylistDetail:
+      allOf:
+        - $ref: '#/components/schemas/UserPlaylist'
+        - type: object
+          required: [songs]
+          properties:
+            songs:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlaylistSong'
+
+    # ── Devices ──
+    Device:
+      type: object
+      required: [id, deviceId, platform, lastActiveAt, createdAt]
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        platform:
+          type: string
+          enum: [android, ios, desktop, tv]
+        lastActiveAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Sync ──
+    SyncResponse:
+      type: object
+      required: [favorites, deletedFavoriteIds, history, playlists, deletedPlaylistIds, serverTime]
+      properties:
+        favorites:
+          type: array
+          items:
+            $ref: '#/components/schemas/Favorite'
+        deletedFavoriteIds:
+          type: array
+          items:
+            type: string
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryEntry'
+        playlists:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPlaylist'
+        deletedPlaylistIds:
+          type: array
+          items:
+            type: string
+        serverTime:
+          type: string
+          format: date-time
+
+    # ── Admin: Auth ──
+    AdminTokenResponse:
+      type: object
+      required: [accessToken, expiresIn]
+      properties:
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: 有效期（秒），无 Refresh Token
+
+    # ── Admin: Users ──
+    AdminUserRole:
+      type: string
+      enum: [USER, ADMIN, SUPER_ADMIN]
+
+    AdminUserItem:
+      type: object
+      required: [id, phone, role, disabled, deviceCount, createdAt]
+      properties:
+        id:
+          type: string
+        phone:
+          type: string
+        role:
+          $ref: '#/components/schemas/AdminUserRole'
+        disabled:
+          type: boolean
+        deviceCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    AdminUserListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMeta'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminUserItem'
+
+    # ── Admin: Config ──
+    ApiConfig:
+      type: object
+      required: [apiBaseUrl, appId, appSecret, cookie]
+      properties:
+        apiBaseUrl:
+          type: string
+          format: uri
+        appId:
+          type: string
+        appSecret:
+          type: string
+          description: 响应中为脱敏值（前6位+***+后4位）
+        cookie:
+          type: string
+          description: 响应中为脱敏值
+
+    JwtConfig:
+      type: object
+      properties:
+        accessTokenTtl:
+          type: integer
+          description: AT 有效期（秒），默认 7200
+        refreshTokenTtl:
+          type: integer
+          description: RT 有效期（秒），默认 2592000
+        maxDevices:
+          type: integer
+          description: 每用户最大设备数（1-10），默认 5
+        userJwtSecret:
+          type: string
+          description: 新值；响应中脱敏；仅 super_admin 可更新
+        adminJwtSecret:
+          type: string
+          description: 新值；响应中脱敏；仅 super_admin 可更新
+
+    SmsConfig:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          type: string
+          enum: [aliyun, tencent]
+        aliyun:
+          type: object
+          properties:
+            accessKeyId:   { type: string }
+            accessKeySecret: { type: string, description: "响应脱敏" }
+            signName:      { type: string }
+            templateCode:  { type: string }
+        tencent:
+          type: object
+          properties:
+            sdkAppId:    { type: string }
+            secretId:    { type: string }
+            secretKey:   { type: string, description: "响应脱敏" }
+            signName:    { type: string }
+            templateId:  { type: string }
+
+    JwtUpdateResponse:
+      type: object
+      required: [affectedSessions]
+      properties:
+        affectedSessions:
+          type: integer
+          description: 因密钥变更被强制下线的会话数
+
+    ConnectivityTestResponse:
+      type: object
+      required: [success, statusCode, latencyMs]
+      properties:
+        success:
+          type: boolean
+        statusCode:
+          type: integer
+        latencyMs:
+          type: integer
+        error:
+          type: string
+
+    # ── Admin: Logs ──
+    OperationLog:
+      type: object
+      required: [id, adminId, action, ip, createdAt]
+      properties:
+        id:
+          type: string
+        adminId:
+          type: string
+        action:
+          type: string
+        targetId:
+          type: string
+          nullable: true
+        beforeVal:
+          type: string
+          nullable: true
+        afterVal:
+          type: string
+          nullable: true
+        ip:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    OperationLogListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMeta'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/OperationLog'
+
+    ProxyLog:
+      type: object
+      required: [id, path, status, latencyMs, cached, createdAt]
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+        status:
+          type: integer
+        latencyMs:
+          type: integer
+        cached:
+          type: boolean
+        upstreamError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ProxyLogListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMeta'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProxyLog'
+
+    # ── Admin: Stats ──
+    StatsOverview:
+      type: object
+      required: [totalUsers, activeUsers7d, totalDevices, cacheHitRate, cookieAlertActive]
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers7d:
+          type: integer
+        totalDevices:
+          type: integer
+        cacheHitRate:
+          type: number
+          format: float
+          description: 最近 24h 缓存命中率（0.0 ~ 1.0）
+        cookieAlertActive:
+          type: boolean
+          description: Cookie 刷新失败告警是否激活
+
+# ─────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────
+paths:
+
+  # ══════════════════════════════════════════
+  # Auth — auth-svc :8001
+  # ══════════════════════════════════════════
+
+  /auth/sms/send:
+    post:
+      tags: [Auth]
+      summary: 发送短信验证码
+      description: |
+        - 同一手机号 60s 内只能发送一次，超出返回 429。
+        - 任何情况下均返回 HTTP 200，不通过响应体泄露验证码是否发送成功。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+                  pattern: '^\+[1-9]\d{6,14}$'
+                  description: E.164 格式，如 +8613800138000
+      responses:
+        '200':
+          description: 已接受（无论是否发送成功）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "ok" }
+        '400':
+          description: 手机号格式错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: INVALID_PHONE
+        '429':
+          description: 发送频率超限
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, retryAfter]
+                properties:
+                  code:
+                    type: string
+                    enum: [RATE_LIMITED]
+                  retryAfter:
+                    type: integer
+                    description: 距下次可发送的秒数
+
+  /auth/sms/verify:
+    post:
+      tags: [Auth]
+      summary: 验证码校验 & 登录/注册
+      description: |
+        - 验证码有效期 5 分钟，验证成功后立即作废（一次性）。
+        - 若 `deviceId` 未传，服务端自动生成并返回。
+        - 超过 `MAX_DEVICES` 时踢出最旧设备。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, code]
+              properties:
+                phone:
+                  type: string
+                  pattern: '^\+[1-9]\d{6,14}$'
+                code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+                  pattern: '^\d{6}$'
+                deviceId:
+                  type: string
+                  description: 客户端生成的 UUID v4，不传则由服务端生成
+                platform:
+                  type: string
+                  enum: [android, ios, desktop, tv]
+                  default: android
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+        '400':
+          description: 验证码错误或已过期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid:
+                  value: { code: INVALID_CODE }
+                expired:
+                  value: { code: CODE_EXPIRED }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: 使用 Refresh Token 换取新 Access Token
+      description: |
+        实现 D-C 原子锁：使用 Redis `GETDEL rt:{deviceId}` 原子操作。
+        - Hash 匹配 → 颁发新 AT + 新 RT（完全轮换）。
+        - Hash 不匹配或 key 不存在 → TOKEN_REUSED，强制重新登录。
+        - 并发两个相同请求：只有第一个成功，第二个得到 nil 并返回 401。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken, deviceId]
+              properties:
+                refreshToken:
+                  type: string
+                deviceId:
+                  type: string
+      responses:
+        '200':
+          description: 换取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefreshResponse'
+        '401':
+          description: RT 无效或重放
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                reused:
+                  value: { code: TOKEN_REUSED }
+                expired:
+                  value: { code: TOKEN_EXPIRED }
+                revoked:
+                  value: { code: DEVICE_REVOKED }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: 退出登录，吊销当前设备 RT
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deviceId]
+              properties:
+                deviceId:
+                  type: string
+      responses:
+        '204':
+          description: 已退出
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ══════════════════════════════════════════
+  # Proxy — proxy-svc :8002
+  # 所有路由需 Authorization Bearer (aud=user)
+  # 所有 200 响应头携带 ETag，支持 If-None-Match → 304
+  # ══════════════════════════════════════════
+
+  /proxy/recommend/banner:
+    get:
+      tags: [Proxy - Recommend]
+      summary: 推荐 Banner 列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/recommend/daily:
+    get:
+      tags: [Proxy - Recommend]
+      summary: 每日推荐歌曲
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/recommend/playlist:
+    get:
+      tags: [Proxy - Recommend]
+      summary: 推荐歌单
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/recommend/new/songs:
+    get:
+      tags: [Proxy - Recommend]
+      summary: 最新单曲
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: type
+          in: query
+          schema:
+            type: string
+            default: "0"
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/recommend/new/albums:
+    get:
+      tags: [Proxy - Recommend]
+      summary: 最新专辑
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: type
+          in: query
+          schema:
+            type: string
+            default: "0"
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/playlist/category:
+    get:
+      tags: [Proxy - Playlist]
+      summary: 歌单分类
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/playlist/information:
+    get:
+      tags: [Proxy - Playlist]
+      summary: 歌单列表（按分类）
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: number
+          in: query
+          schema: { type: string }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - name: sort
+          in: query
+          schema: { type: integer, default: 5 }
+        - name: id
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/playlist/detail:
+    get:
+      tags: [Proxy - Playlist]
+      summary: 歌单详情（含歌曲列表）
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: dissid
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/category:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手区域/性别/流派分类
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/list:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手筛选列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: area
+          in: query
+          schema: { type: integer, default: -100 }
+          description: -100=全部
+        - name: sex
+          in: query
+          schema: { type: integer, default: -100 }
+        - name: genre
+          in: query
+          schema: { type: integer, default: -100 }
+        - name: index
+          in: query
+          schema: { type: integer, default: -100 }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/detail:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手详情
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/albums:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手专辑列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/mvs:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手 MV 列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/artist/songs:
+    get:
+      tags: [Proxy - Artist]
+      summary: 歌手热门歌曲
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/rankings/list:
+    get:
+      tags: [Proxy - Rankings]
+      summary: 排行榜列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/rankings/detail:
+    get:
+      tags: [Proxy - Rankings]
+      summary: 排行榜详情
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - name: period
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/radio/category:
+    get:
+      tags: [Proxy - Radio]
+      summary: 电台分类
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/radio/songlist:
+    get:
+      tags: [Proxy - Radio]
+      summary: 电台歌曲列表（不缓存，直透传）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/mv/category:
+    get:
+      tags: [Proxy - MV]
+      summary: MV 分类
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/mv/list:
+    get:
+      tags: [Proxy - MV]
+      summary: MV 列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: area
+          in: query
+          schema: { type: string, default: "全部" }
+        - name: version
+          in: query
+          schema: { type: string, default: "全部" }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/mv/detail:
+    get:
+      tags: [Proxy - MV]
+      summary: MV 详情（不缓存，直透传）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/album/detail:
+    get:
+      tags: [Proxy - Album]
+      summary: 专辑详情
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/album/songs:
+    get:
+      tags: [Proxy - Album]
+      summary: 专辑歌曲列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/search/hotkey:
+    get:
+      tags: [Proxy - Search]
+      summary: 热搜关键词
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/search:
+    get:
+      tags: [Proxy - Search]
+      summary: 综合搜索
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: keyword
+          in: query
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [song, album, singer, mv]
+            default: song
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /proxy/lyric:
+    get:
+      tags: [Proxy - Lyric]
+      summary: 歌词（TTL 7天长期缓存）
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+          description: song_mid
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxySuccess'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  # ══════════════════════════════════════════
+  # User — sync-svc :8003
+  # ══════════════════════════════════════════
+
+  /user/favorites:
+    get:
+      tags: [User - Sync]
+      summary: 获取收藏列表（分页）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/FavoriteType'
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: 收藏列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User - Sync]
+      summary: 添加收藏
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, targetId]
+              properties:
+                type:
+                  $ref: '#/components/schemas/FavoriteType'
+                targetId:
+                  type: string
+      responses:
+        '201':
+          description: 已添加
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '409':
+          description: 已存在（幂等，安全重复提交）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: ALREADY_EXISTS
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/favorites/{id}:
+    delete:
+      tags: [User - Sync]
+      summary: 删除收藏（软删除）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: 已删除
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/history:
+    get:
+      tags: [User - Sync]
+      summary: 获取播放历史（分页，最近 500 条）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: 播放历史
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User - Sync]
+      summary: 上报播放历史
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [songMid, progress]
+              properties:
+                songMid:
+                  type: string
+                progress:
+                  type: integer
+                  minimum: 0
+                  description: 播放进度（秒）
+      responses:
+        '201':
+          description: 已记录
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/playlists:
+    get:
+      tags: [User - Sync]
+      summary: 获取用户歌单列表（不分页，含歌曲数量）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 歌单列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserPlaylist'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User - Sync]
+      summary: 创建新歌单
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+      responses:
+        '201':
+          description: 已创建
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPlaylist'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/playlists/{id}:
+    get:
+      tags: [User - Sync]
+      summary: 获取歌单详情（含歌曲列表，按 sortOrder 排序）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 歌单详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaylistDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [User - Sync]
+      summary: 更新歌单名称
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+      responses:
+        '200':
+          description: 已更新
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPlaylist'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [User - Sync]
+      summary: 删除歌单（软删除）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: 已删除
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/playlists/{id}/songs:
+    post:
+      tags: [User - Sync]
+      summary: 向歌单添加歌曲
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [songMid]
+              properties:
+                songMid:
+                  type: string
+                sortOrder:
+                  type: integer
+                  minimum: 0
+                  description: 不传则追加到末尾
+      responses:
+        '201':
+          description: 已添加
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaylistSong'
+        '409':
+          description: 歌曲已存在于歌单
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: SONG_ALREADY_IN_PLAYLIST
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/playlists/{id}/songs/{songMid}:
+    delete:
+      tags: [User - Sync]
+      summary: 从歌单删除指定歌曲，并重新排序
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: songMid
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: 已删除
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/progress:
+    get:
+      tags: [User - Sync]
+      summary: 查询指定歌曲播放进度
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: songMid
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 播放进度
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [songMid, progress]
+                properties:
+                  songMid: { type: string }
+                  progress:
+                    type: integer
+                    description: 最近一次记录的进度（秒）
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User - Sync]
+      summary: 更新播放进度
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [songMid, progress]
+              properties:
+                songMid: { type: string }
+                progress: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: 已更新
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/sync:
+    get:
+      tags: [User - Sync]
+      summary: 拉取本地缓存失效后的全量增量数据
+      description: |
+        离线期间所有变更的增量拉取。`since` 为 ISO 8601 时间戳，返回该时间之后的所有变更。
+        包括软删除的项目（通过 `deletedXxxIds` 数组传达）。
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: since
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: RFC3339 时间戳，如 2026-01-01T00:00:00Z
+      responses:
+        '200':
+          description: 增量数据
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/devices:
+    get:
+      tags: [User - Device]
+      summary: 当前用户的设备列表
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 设备列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/devices/{deviceId}:
+    delete:
+      tags: [User - Device]
+      summary: 用户主动下线指定设备
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: 已下线
+        '403':
+          description: 不能操作不属于自己的设备
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: DEVICE_NOT_OWNED
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ══════════════════════════════════════════
+  # Admin — admin-svc :8004
+  # ══════════════════════════════════════════
+
+  /admin/setup/status:
+    get:
+      tags: [Admin - Setup]
+      summary: 查询系统是否已初始化（无需鉴权）
+      responses:
+        '200':
+          description: 初始化状态
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [initialized]
+                properties:
+                  initialized:
+                    type: boolean
+
+  /admin/setup/init:
+    post:
+      tags: [Admin - Setup]
+      summary: 系统首次初始化（无需鉴权，已初始化则返回 403）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                password:
+                  type: string
+                  description: "≥12位，含大小写字母+数字+特殊字符"
+                  minLength: 12
+                siteName:
+                  type: string
+                smsProvider:
+                  type: string
+                  enum: [aliyun, tencent]
+                smsSetting:
+                  $ref: '#/components/schemas/SmsConfig'
+      responses:
+        '201':
+          description: 初始化成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "initialized" }
+        '403':
+          description: 已初始化
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: ALREADY_INITIALIZED
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+
+  /admin/auth/login:
+    post:
+      tags: [Admin - Auth]
+      summary: 管理员登录（Argon2id + 可选 TOTP）
+      description: |
+        - 登录失败计数器使用 Redis，5 次错误后锁定 15min。
+        - Admin Token 无 Refresh Token，TTL 从 ConfigService 读取。
+        - 使用独立的 ADMIN_JWT_SECRET（D-A 决策）。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                totpCode:
+                  type: string
+                  pattern: '^\d{6}$'
+                  description: 开启 TOTP 的账户必须传
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenResponse'
+        '401':
+          description: 凭据错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid:
+                  value: { code: INVALID_CREDENTIALS }
+                totp_required:
+                  value: { code: TOTP_REQUIRED }
+                invalid_totp:
+                  value: { code: INVALID_TOTP }
+        '429':
+          description: 账户锁定
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, unlockAt]
+                properties:
+                  code:
+                    type: string
+                    enum: [ACCOUNT_LOCKED]
+                  unlockAt:
+                    type: string
+                    format: date-time
+
+  /admin/auth/logout:
+    post:
+      tags: [Admin - Auth]
+      summary: 管理员退出（仅记录审计日志，无 RT 吊销）
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 已退出
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/config/api:
+    get:
+      tags: [Admin - Config]
+      summary: 获取第三方 API 配置（敏感字段脱敏）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: API 配置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Admin - Config]
+      summary: 更新第三方 API 配置
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiConfig'
+      responses:
+        '200':
+          description: 已更新
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/config/jwt:
+    get:
+      tags: [Admin - Config]
+      summary: 获取 JWT 配置（密钥脱敏）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: JWT 配置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Admin - Config]
+      summary: 更新 JWT 配置（仅 super_admin；修改密钥触发全量下线）
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtConfig'
+      responses:
+        '200':
+          description: 已更新
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtUpdateResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: INSUFFICIENT_ROLE
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/config/sms:
+    get:
+      tags: [Admin - Config]
+      summary: 获取 SMS 配置（密钥脱敏）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: SMS 配置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Admin - Config]
+      summary: 更新 SMS 配置
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsConfig'
+      responses:
+        '200':
+          description: 已更新
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/config/api/test:
+    post:
+      tags: [Admin - Config]
+      summary: 测试第三方 API 连通性
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 测试结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityTestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users:
+    get:
+      tags: [Admin - Users]
+      summary: 用户列表（分页+手机号搜索）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - name: phone
+          in: query
+          schema: { type: string }
+          description: 手机号前缀搜索（LIKE）
+      responses:
+        '200':
+          description: 用户列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users/{id}/role:
+    put:
+      tags: [Admin - Users]
+      summary: 修改用户角色（仅 super_admin）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '#/components/schemas/AdminUserRole'
+      responses:
+        '200':
+          description: 已更新
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users/{id}/status:
+    put:
+      tags: [Admin - Users]
+      summary: 启用/禁用用户（禁用立即吊销所有 RT）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [disabled]
+              properties:
+                disabled:
+                  type: boolean
+      responses:
+        '200':
+          description: 已更新
+        '403':
+          description: 不能禁用自己
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: CANNOT_DISABLE_SELF
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/devices/{deviceId}:
+    delete:
+      tags: [Admin - Users]
+      summary: 管理员吊销指定设备（DEL RT + 发送 device.kicked）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: 已吊销
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/logs/operations:
+    get:
+      tags: [Admin - Logs]
+      summary: 操作审计日志（分页）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - name: type
+          in: query
+          schema: { type: string }
+          description: 按 action 类型过滤
+      responses:
+        '200':
+          description: 操作日志
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationLogListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/logs/proxy:
+    get:
+      tags: [Admin - Logs]
+      summary: 代理请求日志（分页）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1, minimum: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+        - name: status
+          in: query
+          schema: { type: integer }
+          description: 按 HTTP 状态码过滤（如 502）
+      responses:
+        '200':
+          description: 代理日志
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyLogListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/stats/overview:
+    get:
+      tags: [Admin - Stats]
+      summary: 控制台首屏统计数据
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 统计概览
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsOverview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ─────────────────────────────────────────────
+  # Shared reusable responses & parameters
+  # ─────────────────────────────────────────────
+  responses:
+    Unauthorized:
+      description: Token 缺失或无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing:
+              value: { code: MISSING_TOKEN }
+            invalid:
+              value: { code: INVALID_TOKEN }
+            wrong_aud:
+              value: { code: WRONG_AUDIENCE }
+            user_disabled:
+              value: { code: USER_DISABLED }
+
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INSUFFICIENT_ROLE
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: NOT_FOUND
+
+    InvalidParams:
+      description: 请求参数校验失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INVALID_PARAMS
+
+    ProxySuccess:
+      description: 代理成功，数据来自第三方 API
+      headers:
+        ETag:
+          description: 响应体 SHA-256 hash 的前 16 字节（弱 ETag 格式）
+          schema: { type: string }
+        X-Cache:
+          description: HIT / MISS
+          schema:
+            type: string
+            enum: [HIT, MISS]
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ThirdPartyEnvelope'
+
+    NotModified:
+      description: 内容未变化（If-None-Match 命中），无响应体
+      headers:
+        ETag:
+          schema: { type: string }
+
+    UpstreamError:
+      description: 上游第三方 API 不可达，尝试返回降级缓存数据；若无缓存则 502
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: UPSTREAM_ERROR
+
+  parameters:
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      schema: { type: string }
+      description: 客户端持有的 ETag，服务端命中时返回 304
+
+tags:
+  - name: Auth
+    description: 认证服务（auth-svc :8001）
+  - name: Proxy - Recommend
+    description: 推荐内容代理（proxy-svc :8002）
+  - name: Proxy - Playlist
+    description: 歌单代理（proxy-svc :8002）
+  - name: Proxy - Artist
+    description: 歌手代理（proxy-svc :8002）
+  - name: Proxy - Rankings
+    description: 排行榜代理（proxy-svc :8002）
+  - name: Proxy - Radio
+    description: 电台代理（proxy-svc :8002）
+  - name: Proxy - MV
+    description: MV 代理（proxy-svc :8002）
+  - name: Proxy - Album
+    description: 专辑代理（proxy-svc :8002）
+  - name: Proxy - Search
+    description: 搜索代理（proxy-svc :8002）
+  - name: Proxy - Lyric
+    description: 歌词代理（proxy-svc :8002）
+  - name: User - Sync
+    description: 用户数据同步（sync-svc :8003）
+  - name: User - Device
+    description: 设备管理（sync-svc :8003）
+  - name: Admin - Setup
+    description: 初始化向导（admin-svc :8004，无鉴权）
+  - name: Admin - Auth
+    description: 管理员认证（admin-svc :8004）
+  - name: Admin - Config
+    description: 系统配置（admin-svc :8004）
+  - name: Admin - Users
+    description: 用户管理（admin-svc :8004）
+  - name: Admin - Logs
+    description: 日志查看（admin-svc :8004）
+  - name: Admin - Stats
+    description: 统计概览（admin-svc :8004）

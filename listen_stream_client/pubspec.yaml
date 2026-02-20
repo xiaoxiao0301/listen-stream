@@ -1,0 +1,59 @@
+name: listen_stream_client
+description: Listen Stream — cross-platform music streaming client.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Network
+  dio: ^5.7.0
+  web_socket_channel: ^3.0.1
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Secure storage
+  flutter_secure_storage: ^9.2.2
+
+  # Local DB (cache + ETag)
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
+
+  # Image cache
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+
+  # Audio
+  just_audio: ^0.9.42
+  audio_service: ^0.18.15
+  audio_session: ^0.1.21
+
+  # UI utilities
+  shimmer: ^3.0.0
+  visibility_detector: ^0.4.0+2
+  collection: ^1.18.0
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.13
+  riverpod_generator: ^2.4.3
+  isar_generator: ^3.1.0+1
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true

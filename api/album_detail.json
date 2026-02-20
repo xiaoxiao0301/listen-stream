@@ -1,0 +1,148 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "basicInfo": {
+            "albumMid": "004Bux530GytNj",
+            "albumName": "恒星不忘 Forever Forever",
+            "tranName": "",
+            "publishDate": "2025-12-05",
+            "desc": "回应你的愿望，\n把不可能，变成正在发生的此刻！\n\n宇宙级最强恒星阵容梦幻合体 ——\n周杰伦 ╳ 言承旭 ╳ 吴建豪 ╳ 周渝民 ╳ 五月天 阿信\n\n【 恒星不忘 ✦ Forever Forever 】\n周杰伦作曲｜五月天 阿信作词\n神级阵容  世纪级联手\n携手写下前所未见的传奇新篇章\n\n别来无恙，无论你走到哪，\n也要在同一片天空下发光；\n是一眼瞬间的默契，\n是信念里成长的乐章。\nForever, forever——\n\n五道闪耀光芒，穿透黑夜，绽放恒星不忘。\n\n▍恒星不忘 ✦ Forever Forever \n\n词｜五月天 阿信\n曲｜周杰伦\n作词协力｜黄婷\n\nForever Forever \n无论你走到哪  \n也要在同一片天空下发光\nForever Forever\n把徬徨的心都点亮\n拥抱彼此的模样\n永恒回忆就像恒星不忘\n\n流星划过喧扰穹苍\n可曾回应谁的愿望 \n我已走到儿时的远方\n却遗失了自己的模样\n\n梦想逐渐增加重量\n我们是否不再幻想\n用尽整个青春去荒唐\n也用整个人生去飞翔\n\nForever Forever \n无论你走到哪  \n也要在同一片天空下发光\nForever Forever\n把徬徨的心都点亮\n拥抱彼此的模样\n永恒回忆就像恒星不忘\n\n庆幸这场别来无恙\n沉默里藏着太多话\n岁月从不放过谁脸庞\n却也在心中留下宝藏\n\n烟火再次绽放辉煌\n失落瞳孔倒映希望\n每当前路风横雨又狂\n让我再陪你展开翅膀\n\nForever Forever \n无论你走到哪  \n也要在同一片天空下发光\nForever Forever\n把徬徨的心都点亮\n拥抱彼此的模样\n永恒回忆就像恒星不忘\n\nForever Forever \n无论你走到哪  \n也要在同一片天空下发光\nForever Forever\n把徬徨的心都点亮\n重回最好的时光\n永恒回忆就像恒星不忘",
+            "genre": "",
+            "language": "国语",
+            "albumType": "Single",
+            "genreURL": "",
+            "lanURL": "",
+            "albumTag3": 0,
+            "recordNum": "",
+            "albumID": 79852715,
+            "pmid": "004Bux530GytNj_2",
+            "type": 10002,
+            "modifyTime": 1764927332,
+            "color": 2965836,
+            "fpaymid": "",
+            "topListContent": "",
+            "topListSchema": "",
+            "adStatus": 0,
+            "encourageVideoStatus": 0,
+            "wikiurl": "",
+            "awards": [],
+            "LanRenBookUrl": "",
+            "adJson": "{\"bu_data_str1\":\"\",\"bu_data_str2\":\"\"}",
+            "vid": "",
+            "operateStatus": 0,
+            "genres": [
+                {
+                    "name": "",
+                    "url": "qqmusic://qq.com/ui/similarSongs?p=%7B%22songid%22%3A%220%22%2C%22tagid%22%3A%220%22%2C%22tagName%22%3A%22%22%7D"
+                }
+            ],
+            "album_right": 3145728,
+            "adTag": 0,
+            "headVideoVid": "",
+            "headVideoFrame": "",
+            "headMediaList": null,
+            "brand": {
+                "id": 0,
+                "name": "",
+                "url": ""
+            },
+            "albumDuration": 4,
+            "recText": "",
+            "recLabels": null,
+            "genreNew": "",
+            "bookletUrl": "",
+            "singerInterpretation": {
+                "url": "",
+                "mediaMid": "",
+                "expireAtTs": 0,
+                "duration": 0,
+                "title": "",
+                "size": 0,
+                "translate": "",
+                "like": "",
+                "hasLike": 0,
+                "translateType": 0,
+                "likeNum": 0
+            },
+            "bookletUrlNew": "https://y.qq.com/m/client/lyrics_book/album_book_list.html?albumMid=004Bux530GytNj&onlyPDF=0",
+            "debutBtn": 0,
+            "isReserved": false,
+            "reservedTotalCnt": 0,
+            "dynamicCoverVid": "",
+            "threeDUrl": "",
+            "album_right_new": 3145728
+        },
+        "company": {
+            "ID": 8051961,
+            "name": "F✦FOREVER",
+            "headPic": "",
+            "isShow": 0,
+            "brief": ""
+        },
+        "singer": {
+            "singerList": [
+                {
+                    "mid": "0025NhlN2yWrP4",
+                    "name": "周杰伦",
+                    "transName": "Jay Chou",
+                    "role": "singer",
+                    "instrument": "无乐器",
+                    "singerID": 4558,
+                    "type": 1,
+                    "singerType": 0,
+                    "pmid": "0025NhlN2yWrP4_10",
+                    "indentity": 0
+                },
+                {
+                    "mid": "004VN9Ui1Omv94",
+                    "name": "言承旭",
+                    "transName": "Jerry Yan",
+                    "role": "singer",
+                    "instrument": "无乐器",
+                    "singerID": 4944,
+                    "type": 1,
+                    "singerType": 0,
+                    "pmid": "004VN9Ui1Omv94_3",
+                    "indentity": 0
+                },
+                {
+                    "mid": "001Ue7bB0Bjbe8",
+                    "name": "吴建豪",
+                    "transName": "Vanness Wu",
+                    "role": "singer",
+                    "instrument": "无乐器",
+                    "singerID": 266,
+                    "type": 1,
+                    "singerType": 0,
+                    "pmid": "001Ue7bB0Bjbe8_7",
+                    "indentity": 0
+                },
+                {
+                    "mid": "000ICvx62mc19U",
+                    "name": "周渝民",
+                    "transName": "",
+                    "role": "singer",
+                    "instrument": "无乐器",
+                    "singerID": 270,
+                    "type": 1,
+                    "singerType": 0,
+                    "pmid": "000ICvx62mc19U_3",
+                    "indentity": 0
+                },
+                {
+                    "mid": "0040EhGd2lkffO",
+                    "name": "五月天 阿信",
+                    "transName": "Ashin",
+                    "role": "singer",
+                    "instrument": "无乐器",
+                    "singerID": 6617,
+                    "type": 1,
+                    "singerType": 0,
+                    "pmid": "0040EhGd2lkffO_2",
+                    "indentity": 0
+                }
+            ]
+        }
+    }
+}

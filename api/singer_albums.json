@@ -1,0 +1,722 @@
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "list": [
+            {
+                "albumid": 79852715,
+                "album_mid": "004Bux530GytNj",
+                "album_name": "恒星不忘 Forever Forever",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "回应你的愿望，把不可能，变成正在发生的此刻！宇宙级最强恒星阵容梦幻合体 ——周杰伦 ╳ 言承旭 ╳ 吴建豪 ╳ 周渝民 ╳ 五月天 阿信【 恒星不忘...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 621944135,
+                    "track_name": "恒星不忘 Forever Forever"
+                },
+                "listen_count": 0,
+                "pub_time": "2025-12-05",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    },
+                    {
+                        "singer_id": 4944,
+                        "singer_mid": "004VN9Ui1Omv94",
+                        "singer_name": "言承旭"
+                    },
+                    {
+                        "singer_id": 266,
+                        "singer_mid": "001Ue7bB0Bjbe8",
+                        "singer_name": "吴建豪"
+                    },
+                    {
+                        "singer_id": 270,
+                        "singer_mid": "000ICvx62mc19U",
+                        "singer_name": "周渝民"
+                    }
+                ]
+            },
+            {
+                "albumid": 68589582,
+                "album_mid": "001uKKpF1RuJSd",
+                "album_name": "即兴曲",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "置身Beatles录音室　周杰伦一气呵成创作「即兴曲」     乐坛天王周杰伦创作出许多脍炙人口的畅销歌曲，灵光乍现的瞬间，每每留下经典隽永的作品！...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "纯音乐",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 582359862,
+                    "track_name": "即兴曲"
+                },
+                "listen_count": 0,
+                "pub_time": "2025-06-06",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 61118684,
+                "album_mid": "001g7BIA0IyPBZ",
+                "album_name": "Six Degrees",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "2025 只循环播放这首情歌！潮流创作才子＆亚洲流行天王派伟俊 Patrick Brasca x 周杰伦 Jay ChouSix Degrees命定",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 555154644,
+                    "track_name": "Six Degrees"
+                },
+                "listen_count": 0,
+                "pub_time": "2025-01-10",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 1043869,
+                "singer_mid": "000kZUyu0aPr9t",
+                "singer_name": "派伟俊",
+                "singers": [
+                    {
+                        "singer_id": 1043869,
+                        "singer_mid": "000kZUyu0aPr9t",
+                        "singer_name": "派伟俊"
+                    },
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 52616075,
+                "album_mid": "0039qQsU3Thnb5",
+                "album_name": "稻香 (Remix摇滚版)",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "再度与雪碧合作，全球品牌代言人周杰伦，带来【稻香Remix摇滚版】，希望大家一整个夏天都很chill~",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 497994581,
+                    "track_name": "稻香"
+                },
+                "listen_count": 0,
+                "pub_time": "2024-07-03",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 44806901,
+                "album_mid": "001ln9YB420a7b",
+                "album_name": "圣诞星 (feat. 杨瑞代)",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "如果，宇宙中有我这么一颗『星』我会希望，是你 发现 我今年最惊喜的圣诞礼物！周杰伦Jay ChouJay式圣诞小品圣诞星有它陪你过圣诞，一个人也可以...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 457240977,
+                    "track_name": "圣诞星 (feat. 杨瑞代)"
+                },
+                "listen_count": 0,
+                "pub_time": "2023-12-22",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 28791467,
+                "album_mid": "0042cH172YJ0mz",
+                "album_name": "最伟大的作品",
+                "albumtype": "录音室专辑",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "当一件伟大的作品被创作出来时艺术家并不会知道自己成就了一整个艺术时代终于等到周杰伦JAY CHOU最伟大的作品Greatest Works Of A...",
+                "attribute5": "0",
+                "ftype": "0",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 12,
+                    "songid": 362435564,
+                    "track_name": "我是如此相信"
+                },
+                "listen_count": 0,
+                "pub_time": "2022-07-15",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 12924001,
+                "album_mid": "0009C3rp3Kfwg0",
+                "album_name": "Mojito",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "夏季限定特调上架！周杰伦Jay Chou最新拉丁嘻哈沁脾情歌MOJITO一起恋上古巴的微醺浪漫在古巴的海滩，点一杯大文豪海明威最爱的Mojito和周...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 268352018,
+                    "track_name": "Mojito"
+                },
+                "listen_count": 0,
+                "pub_time": "2020-06-12",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 9612009,
+                "album_mid": "001hGx1Z0so1YX",
+                "album_name": "我是如此相信",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "周杰伦“我是如此相信”MV 助威电影“天火”乐坛天王周杰伦为昆凌主演的新片“天火”写歌并演唱主题曲“我是如此相信”，随着电影上映，粉丝在电影院里透过...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 247261229,
+                    "track_name": "我是如此相信"
+                },
+                "listen_count": 0,
+                "pub_time": "2019-12-15",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 9040723,
+                "album_mid": "004fXSyj3bWTMN",
+                "album_name": "周杰伦地表最强世界巡回演唱会",
+                "albumtype": "现场专辑",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "地表最强音乐引力太空人也挡不住！用音乐出发，建构出神入化的感官新宇宙！周杰伦“地表最强THE INVINCIBLE”演唱会DVD版.蓝光版太空银.宇...",
+                "attribute5": "0",
+                "ftype": "1",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 25,
+                    "songid": 244115402,
+                    "track_name": "稻香"
+                },
+                "listen_count": 0,
+                "pub_time": "2019-11-01",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 7876962,
+                "album_mid": "002gBTVk4JEE2T",
+                "album_name": "说好不哭（with 五月天阿信）",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "全球等到哭的激动！全球听到哭的感动！周杰伦2019霸气推新歌「说好不哭」Jay式心疼情歌重磅回归方文山「以词说戏」走心之作你的限时动态是我的过去式我...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 237773700,
+                    "track_name": "说好不哭 (with 五月天阿信)"
+                },
+                "listen_count": 0,
+                "pub_time": "2019-09-16",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 4044657,
+                "album_mid": "001CnPE31iJ899",
+                "album_name": "不爱我就拉倒",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "2018/5/15周杰伦即将突袭数位音源榜最新单曲全球数位发行[不爱我就拉倒]如果说「等你下课」是青春记忆的奶茶手摇杯「不爱我就拉倒」就是浓烈口感的...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 213922043,
+                    "track_name": "不爱我就拉倒"
+                },
+                "listen_count": 0,
+                "pub_time": "2018-05-15",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 3883404,
+                "album_mid": "003bSL0v4bpKAx",
+                "album_name": "等你下课",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "周杰伦 2018最新单曲「等你下课」不想让你等太久！周杰伦给歌迷的惊喜特选1/18 生日当天发布文青疗愈系暗恋情歌「等你下课」努力考上跟你喜欢的人一...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 212877900,
+                    "track_name": "等你下课 (with 杨瑞代)"
+                },
+                "listen_count": 0,
+                "pub_time": "2018-01-18",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 1458791,
+                "album_mid": "003RMaRI1iFoYd",
+                "album_name": "周杰伦的床边故事",
+                "albumtype": "录音室专辑",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "夜深了猫头鹰出没数完第一千零一个尖叫声开始听周杰伦 的床边故事Jay Chou’s Bedtime Stories今年最令人激动的乐坛震撼弹周杰伦2...",
+                "attribute5": "0",
+                "ftype": "0",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 10,
+                    "songid": 107192080,
+                    "track_name": "爱情废柴"
+                },
+                "listen_count": 348717248,
+                "pub_time": "2016-06-24",
+                "score": "950",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 1366240,
+                "album_mid": "004c8Md02WHHju",
+                "album_name": "周杰伦魔天伦世界巡回演唱会",
+                "albumtype": "现场专辑",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "从2013年5月17日首场，到2015年12月20日，「魔天伦演唱会」巡回全世界共76场，现场观赏人次超过180万以上，这76个独特的夜晚，累积超越...",
+                "attribute5": "0",
+                "ftype": "1",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 22,
+                    "songid": 106291315,
+                    "track_name": "阳光宅男"
+                },
+                "listen_count": 5543122,
+                "pub_time": "2016-05-10",
+                "score": "949",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 1306793,
+                "album_mid": "001uJFiE0tbGGa",
+                "album_name": "英雄",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "等待《英雄》终于现声！周杰伦 2016最新创作单曲《英雄》属于召唤师们的战歌号召各界英雄  击响战鼓  全面出动！人生不是一个人的游戏一起奋斗一起超...",
+                "attribute5": "0",
+                "ftype": "10",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 105755384,
+                    "track_name": "英雄"
+                },
+                "listen_count": 58267716,
+                "pub_time": "2016-03-24",
+                "score": "903",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 1268858,
+                "album_mid": "001V8fw21OdEnP",
+                "album_name": "Try",
+                "albumtype": "EP单曲",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "周杰伦首次操刀监制动画电影主题曲 推荐徒弟派伟俊写曲演唱《功夫熊猫3》继前作的剧情，故事讲述神龙大侠熊猫「阿宝」(台湾译阿波)在寻找自己身世之谜的过...",
+                "attribute5": "1",
+                "ftype": "10",
+                "type": 0,
+                "lan": "英语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 105471061,
+                    "track_name": "Try"
+                },
+                "listen_count": 25678084,
+                "pub_time": "2016-01-06",
+                "score": "929",
+                "shoufa": 0,
+                "singer_id": 1043869,
+                "singer_mid": "000kZUyu0aPr9t",
+                "singer_name": "派伟俊",
+                "singers": [
+                    {
+                        "singer_id": 1043869,
+                        "singer_mid": "000kZUyu0aPr9t",
+                        "singer_name": "派伟俊"
+                    },
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 852856,
+                "album_mid": "001uqejs3d6EID",
+                "album_name": "哎呦，不错哦",
+                "albumtype": "录音室专辑",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "年度特大号期待！很Jay的一张专辑周杰伦 Jay Chou 哎呦，不错哦JAY语录里最被流传模仿的一句  最周杰伦的一张创作以幽默拉开序幕，给你「鞋...",
+                "attribute5": "0",
+                "ftype": "0",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 12,
+                    "songid": 101787873,
+                    "track_name": "听见下雨的声音"
+                },
+                "listen_count": 302017268,
+                "pub_time": "2014-12-26",
+                "score": "962",
+                "shoufa": 1,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 453899,
+                "album_mid": "003b9EXT2QU0T7",
+                "album_name": "黄俊郎的黑",
+                "albumtype": "参与过的专辑",
+                "company": {
+                    "companyid": 2317,
+                    "company_name": "杰威尔音乐有限公司"
+                },
+                "desc": "这是一个你很少见过的、周杰伦的样子 一个用他一生无法离开的钢琴，来诠释一本美丽的书、一段美丽旅程的周杰伦 阿郎老师说：「写出这首钢琴曲的杰伦，是我见...",
+                "attribute5": "1",
+                "ftype": "0",
+                "type": 0,
+                "lan": "纯音乐",
+                "latest_song": {
+                    "song_count": 8,
+                    "songid": 5159492,
+                    "track_name": "这所有的一切"
+                },
+                "listen_count": 2182697,
+                "pub_time": "2013-12-25",
+                "score": "937",
+                "shoufa": 0,
+                "singer_id": 13886,
+                "singer_mid": "002Z462D2amcz9",
+                "singer_name": "杨瑞代",
+                "singers": [
+                    {
+                        "singer_id": 13886,
+                        "singer_mid": "002Z462D2amcz9",
+                        "singer_name": "杨瑞代"
+                    },
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 14928632,
+                "album_mid": "001CFcTU4OwTSu",
+                "album_name": "周杰伦2013《魔天伦》台北小巨蛋演唱会",
+                "albumtype": "现场专辑",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "2013年9月8日，周杰伦巡演台北站，，利用虚拟影像重建技术，身着一袭白旗袍的邓丽君从舞台下缓缓升起，更和周杰伦合唱了三首歌曲，一颦一笑，栩栩如生，...",
+                "attribute5": "0",
+                "ftype": "1",
+                "type": 0,
+                "lan": "国语",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 279603976,
+                    "track_name": "你怎么说+红尘客栈+千里之外"
+                },
+                "listen_count": 0,
+                "pub_time": "2013-09-08",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            },
+            {
+                "albumid": 6514409,
+                "album_mid": "000Hu2Lp0Saxya",
+                "album_name": "魔天伦世界巡回演唱会 上海演唱会第1场",
+                "albumtype": "现场专辑",
+                "company": {
+                    "companyid": 0,
+                    "company_name": ""
+                },
+                "desc": "",
+                "attribute5": "0",
+                "ftype": "1",
+                "type": 0,
+                "lan": "其他",
+                "latest_song": {
+                    "song_count": 1,
+                    "songid": 503387219,
+                    "track_name": "明明就"
+                },
+                "listen_count": 0,
+                "pub_time": "2013-05-17",
+                "score": "0",
+                "shoufa": 0,
+                "singer_id": 4558,
+                "singer_mid": "0025NhlN2yWrP4",
+                "singer_name": "周杰伦",
+                "singers": [
+                    {
+                        "singer_id": 4558,
+                        "singer_mid": "0025NhlN2yWrP4",
+                        "singer_name": "周杰伦"
+                    }
+                ]
+            }
+        ],
+        "singer_id": 4558,
+        "singer_mid": "0025NhlN2yWrP4",
+        "singer_name": "周杰伦",
+        "total": 43
+    }
+}
