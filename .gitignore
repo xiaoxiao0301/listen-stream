@@ -17,8 +17,13 @@
 
 # ── Environment / Secrets ─────────────────────────────────────────────────────
 .env
-.env.*
-!.env.example          # 保留示例文件
+.env.local
+.env.development
+.env.production
+.env.test
+# 明确保留所有 .env.example（否定规则需在同一层级生效，用 force-add 兜底）
+!.env.example
+!**/.env.example
 
 # ── Go ────────────────────────────────────────────────────────────────────────
 listen_stream_server/vendor/
