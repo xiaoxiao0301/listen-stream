@@ -20,9 +20,13 @@ final rankingListProvider = FutureProvider<List<RankingGroup>>((ref) async {
 });
 
 // ── Ranking Detail ──────────────────────────────────────────────────────────
-final rankingDetailProvider = FutureProvider.family<RankingCategory, ({int topId, int page})>((ref, params) async {
+final rankingDetailProvider = FutureProvider.family<RankingCategory, ({int topId, int page, String? period})>((ref, params) async {
   final api = ref.read(apiServiceProvider);
-  final resp = await api.getRankingDetail(params.topId.toString(), page: params.page);
+  final resp = await api.getRankingDetail(
+    params.topId.toString(),
+    page: params.page,
+    period: params.period,
+  );
   
   if (resp['code'] != 1) {
     throw Exception(resp['message'] ?? 'Failed to fetch ranking detail');

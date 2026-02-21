@@ -6,6 +6,7 @@ class SongItem {
     required this.name,
     this.singerNames = const [],
     this.albumName,
+    this.albumMid,
   });
 
   final int id;
@@ -13,6 +14,7 @@ class SongItem {
   final String name;
   final List<String> singerNames;
   final String? albumName;
+  final String? albumMid;
 
   factory SongItem.fromJson(Map<String, dynamic> json) {
     final singers = json['singer'] as List?;
@@ -29,9 +31,16 @@ class SongItem {
       name: json['name'] as String? ?? '',
       singerNames: singerNames,
       albumName: album?['name'] as String?,
+      albumMid: album?['mid'] as String?,
     );
   }
 
   String get displayName => name;
   String get displayArtist => singerNames.join('、');
+  String get coverUrl {
+    if (albumMid == null || albumMid!.isEmpty) {
+      return '';
+    }
+    return 'https://y.gtimg.cn/music/photo_new/T002R300x300M000$albumMid.jpg';
+  }
 }

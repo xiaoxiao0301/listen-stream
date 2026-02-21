@@ -12,6 +12,7 @@ import 'features/player/page.dart';
 import 'features/singer/page.dart';
 import 'features/playlist/page.dart';
 import 'features/album/page.dart';
+import 'features/song/page.dart';
 import 'features/search/page.dart';
 import 'features/ranking/list_page.dart';
 import 'features/ranking/detail_page.dart';
@@ -75,6 +76,10 @@ final _router = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/album/:mid',
             builder: (_, state) => AlbumDetailPage(albumMid: state.pathParameters['mid']!),
+          ),
+          GoRoute(
+            path: '/song/:mid',
+            builder: (_, state) => SongDetailPage(songMid: state.pathParameters['mid']!),
           ),
           GoRoute(path: '/library', builder: (_, __) => const LibraryPage()),
           GoRoute(path: '/player', builder: (_, __) => const PlayerPage()),

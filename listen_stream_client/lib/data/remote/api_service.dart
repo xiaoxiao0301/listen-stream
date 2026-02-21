@@ -24,18 +24,26 @@ class ApiService {
       (await _dio.get<Map<String, dynamic>>('/api/recommend/banner')).data!;
   Future<Map<String, dynamic>> getRecommendPlaylist() async =>
       (await _dio.get<Map<String, dynamic>>('/api/recommend/playlist')).data!;
-  Future<Map<String, dynamic>> getRecommendNewSongs() async =>
-      (await _dio.get<Map<String, dynamic>>('/api/recommend/new-songs')).data!;
-  Future<Map<String, dynamic>> getRecommendNewAlbums() async =>
-      (await _dio.get<Map<String, dynamic>>('/api/recommend/new-albums')).data!;
+  Future<Map<String, dynamic>> getRecommendNewSongs({int type = 5}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/recommend/new-songs', queryParameters: {'type': type})).data!;
+  Future<Map<String, dynamic>> getRecommendNewAlbums({int type = 1}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/recommend/new-albums', queryParameters: {'type': type})).data!;
   Future<Map<String, dynamic>> getRecommendDaily() async =>
       (await _dio.get<Map<String, dynamic>>('/api/recommend/daily')).data!;
 
   // ── Proxy: Playlist ─────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getPlaylistCategories() async =>
       (await _dio.get<Map<String, dynamic>>('/api/playlist/categories')).data!;
-  Future<Map<String, dynamic>> getPlaylistDetail(String id) async =>
-      (await _dio.get<Map<String, dynamic>>('/api/playlist/detail', queryParameters: {'id': id})).data!;
+  Future<Map<String, dynamic>> getPlaylistInformation({
+    int number = 1,
+    int size = 20,
+    int sort = 5,
+    String id = '10000000',
+  }) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/playlist/information',
+          queryParameters: {'number': number, 'size': size, 'sort': sort, 'id': id})).data!;
+  Future<Map<String, dynamic>> getPlaylistDetail(String dissid) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/playlist/detail', queryParameters: {'dissid': dissid})).data!;
 
   // ── Proxy: Singer ───────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getSingerFilterOptions() async =>
@@ -84,8 +92,19 @@ class ApiService {
   // ── Proxy: Ranking ──────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getRankingList() async =>
       (await _dio.get<Map<String, dynamic>>('/api/ranking/list')).data!;
-  Future<Map<String, dynamic>> getRankingDetail(String id, {int page = 1}) async =>
-      (await _dio.get<Map<String, dynamic>>('/api/ranking/detail', queryParameters: {'id': id, 'page': page})).data!;
+  Future<Map<String, dynamic>> getRankingDetail(
+    String id, {
+    int page = 1,
+    int size = 100,
+    String? period,
+  }) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/ranking/detail',
+          queryParameters: {
+            'id': id,
+            'page': page,
+            'size': size,
+            if (period != null) 'period': period,
+          })).data!;
 
   // ── Proxy: Radio ────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getRadioList() async =>

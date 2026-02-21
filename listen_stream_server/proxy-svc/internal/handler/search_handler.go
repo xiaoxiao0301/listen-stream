@@ -31,7 +31,9 @@ func (h *SearchHandler) searchSongs(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
 		return
 	}
-	h.handle(c, "/search/song", pxcfg.ProxyTTL["/search"])
+	// Upstream API: /search/?keyword=xxx&type=0
+	c.Request.URL.RawQuery += "&type=0"
+	h.handle(c, "/search/", pxcfg.ProxyTTL["/search"])
 }
 
 func (h *SearchHandler) searchSingers(c *gin.Context) {
@@ -39,7 +41,9 @@ func (h *SearchHandler) searchSingers(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
 		return
 	}
-	h.handle(c, "/search/singer", pxcfg.ProxyTTL["/search"])
+	// Upstream API: /search/?keyword=xxx&type=9
+	c.Request.URL.RawQuery += "&type=9"
+	h.handle(c, "/search/", pxcfg.ProxyTTL["/search"])
 }
 
 func (h *SearchHandler) searchAlbums(c *gin.Context) {
@@ -47,7 +51,9 @@ func (h *SearchHandler) searchAlbums(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
 		return
 	}
-	h.handle(c, "/search/albums", pxcfg.ProxyTTL["/search"])
+	// Upstream API: /search/?keyword=xxx&type=8
+	c.Request.URL.RawQuery += "&type=8"
+	h.handle(c, "/search/", pxcfg.ProxyTTL["/search"])
 }
 
 func (h *SearchHandler) searchMvs(c *gin.Context) {
@@ -55,7 +61,9 @@ func (h *SearchHandler) searchMvs(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
 		return
 	}
-	h.handle(c, "/search/mv", pxcfg.ProxyTTL["/search"])
+	// Upstream API: /search/?keyword=xxx&type=12
+	c.Request.URL.RawQuery += "&type=12"
+	h.handle(c, "/search/", pxcfg.ProxyTTL["/search"])
 }
 
 // search validates the required keyword param.

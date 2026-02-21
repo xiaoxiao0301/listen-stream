@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/models.dart';
 import '../../shared/widgets/app_error_widget.dart';
+import '../../shared/widgets/song_list_tile.dart';
 import 'provider.dart';
 
 class AlbumDetailPage extends ConsumerWidget {
@@ -120,37 +121,13 @@ class _AlbumContent extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final song = album.songList[index];
-              return ListTile(
-                leading: SizedBox(
-                  width: 40,
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  song.songName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: song.singerName != null
-                    ? Text(
-                        song.singerName!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
-                trailing: Text(
-                  song.durationText,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('播放: ${song.songName}')),
-                  );
-                },
+              return SongListTile(
+                index: index,
+                songMid: song.songMid,
+                songName: song.songName,
+                artistName: song.singerName ?? '',
+                albumMid: album.albumMid,
+                duration: song.interval,
               );
             },
             childCount: album.songList.length,

@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SingerHandler serves /api/artist/* endpoints.
@@ -34,14 +35,18 @@ func (h *SingerHandler) list(c *gin.Context) {
 	h.handle(c, "/artist/list", pxcfg.ProxyTTL["/artist/list"])
 }
 func (h *SingerHandler) detail(c *gin.Context) {
-	h.handle(c, "/artist/detail", pxcfg.ProxyTTL["/artist/detail"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/artist/detail", pxcfg.ProxyTTL["/artist/detail"], map[string]string{"mid": "id"})
 }
 func (h *SingerHandler) albums(c *gin.Context) {
-	h.handle(c, "/artist/albums", pxcfg.ProxyTTL["/artist/albums"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/artist/albums", pxcfg.ProxyTTL["/artist/albums"], map[string]string{"mid": "id"})
 }
 func (h *SingerHandler) mvs(c *gin.Context) {
-	h.handle(c, "/artist/mvs", pxcfg.ProxyTTL["/artist/mvs"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/artist/mvs", pxcfg.ProxyTTL["/artist/mvs"], map[string]string{"mid": "id"})
 }
 func (h *SingerHandler) songs(c *gin.Context) {
-	h.handle(c, "/artist/songs", pxcfg.ProxyTTL["/artist/songs"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/artist/songs", pxcfg.ProxyTTL["/artist/songs"], map[string]string{"mid": "id"})
 }

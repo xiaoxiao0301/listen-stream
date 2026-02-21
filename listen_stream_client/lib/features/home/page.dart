@@ -42,6 +42,40 @@ class _HomePageState extends ConsumerState<HomePage> {
 
             const SizedBox(height: 16),
 
+            // ── Quick Navigation ──────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavItem(
+                    icon: Icons.trending_up,
+                    label: '排行榜',
+                    onTap: () => context.push('/ranking'),
+                  ),
+                  _NavItem(
+                    icon: Icons.radio,
+                    label: '电台',
+                    onTap: () => context.push('/radio'),
+                  ),
+                  _NavItem(
+                    icon: Icons.person,
+                    label: '歌手',
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('歌手分类开发中')),
+                    ),
+                  ),
+                  _NavItem(
+                    icon: Icons.video_library,
+                    label: 'MV',
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('MV功能开发中')),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             // ── Recommend Playlist ────────────────────────────────────────
             ref.watch(recommendPlaylistProvider).when(
               data: (items) => _PlaylistSection(title: '推荐歌单', items: items),
@@ -158,7 +192,7 @@ class _PlaylistSection extends StatelessWidget {
                 coverUrl: item.coverUrl,
                 title: item.title,
                 subtitle: item.creatorNick,
-                onTap: () => context.push('/playlist/${item.tid}'),
+                onTap: () => context.push('/playlist/${item.id}'),
               );
             },
           ),
@@ -189,19 +223,11 @@ class _SongSection extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (_, i) {
               final item = items[i];
-              // 歌曲使用专辑封面，通过 album.mid 构建
-              final albumMid = item.mid; // 简化处理，实际应从 album 获取
-              final coverUrl = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000$albumMid.jpg';
               return _CardItem(
-                coverUrl: coverUrl,
+                coverUrl: item.coverUrl,
                 title: item.name,
                 subtitle: item.displayArtist,
-                onTap: () {
-                  // TODO: 播放歌曲
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('播放: ${item.name}')),
-                  );
-                },
+                onTap: () => context.push('/song/${item.mid}'),
               );
             },
           ),
@@ -291,6 +317,38 @@ class _CardItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis, 
               style: const TextStyle(fontSize: 12),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Navigation Item ─────────────────────────────────────────────────────────
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 32),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(fontSize: 12)),
           ],
         ),
       ),

@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // MVHandler serves /api/mv/* endpoints.
@@ -24,5 +25,6 @@ func (h *MVHandler) list(c *gin.Context) {
 	h.handle(c, "/mv/list", pxcfg.ProxyTTL["/mv/list"])
 }
 func (h *MVHandler) detail(c *gin.Context) {
-	h.handle(c, "/mv/detail", pxcfg.ProxyTTL["/mv/detail"]) // TTL == 0
+	// Client sends 'vid', upstream expects 'id'
+	h.handleWithParamMap(c, "/mv/detail", pxcfg.ProxyTTL["/mv/detail"], map[string]string{"vid": "id"}) // TTL == 0
 }

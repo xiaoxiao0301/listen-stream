@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // AlbumHandler serves /api/album/* endpoints.
@@ -16,8 +17,10 @@ func (h *AlbumHandler) Register(rg *gin.RouterGroup) {
 }
 
 func (h *AlbumHandler) detail(c *gin.Context) {
-	h.handle(c, "/album/detail", pxcfg.ProxyTTL["/album/detail"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/album/detail", pxcfg.ProxyTTL["/album/detail"], map[string]string{"mid": "id"})
 }
 func (h *AlbumHandler) songs(c *gin.Context) {
-	h.handle(c, "/album/songs", pxcfg.ProxyTTL["/album/songs"])
+	// Client sends 'mid', upstream expects 'id'
+	h.handleWithParamMap(c, "/album/songs", pxcfg.ProxyTTL["/album/songs"], map[string]string{"mid": "id"})
 }

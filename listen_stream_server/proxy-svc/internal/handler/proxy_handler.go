@@ -34,6 +34,34 @@ func NewProxyHandler(client *upstream.Client, rdbClient *rdb.Client, log *zap.Lo
 	}
 }
 
+// handleWithParamMap handles requests with parameter name mapping (e.g., mid → id).
+// paramMap is a map of {clientParamName: upstreamParamName}.
+func (h *ProxyHandler) handleWithParamMap(c *gin.Context, upstreamPath string, ttl time.Duration, paramMap map[string]string) {
+	// Build remapped query string
+	values := make(map[string]string)
+	for clientKey, upstreamKey := range paramMap {
+		if val := c.Query(clientKey); val != "" {
+			values[upstreamKey] = val
+		}
+	}
+	// Preserve other query params that don't need mapping
+	for k := range c.Request.URL.Query() {
+		if _, mapped := paramMap[k]; !mapped {
+			values[k] = c.Query(k)
+		}
+	}
+	
+	// Build query string
+	var parts []string
+	for k, v := range values {
+		parts = append(parts, fmt.Sprintf("%s=%s", k, v))
+	}
+	sort.Strings(parts)
+	remappedQuery := strings.Join(parts, "&")
+	
+	h.handleWithQuery(c, upstreamPath, ttl, remappedQuery)
+}
+
 // handle is the single dispatch point: cache lookup → upstream → cache write.
 //
 //  1. Normalise query params (sort keys + values alphabetically) and SHA-256
@@ -44,12 +72,17 @@ func NewProxyHandler(client *upstream.Client, rdbClient *rdb.Client, log *zap.Lo
 //  5. Upstream failure on a cached (possibly stale) path → return stale copy
 //     with X-Cache: STALE header rather than propagating a 5xx.
 func (h *ProxyHandler) handle(c *gin.Context, upstreamPath string, ttl time.Duration) {
+	h.handleWithQuery(c, upstreamPath, ttl, c.Request.URL.RawQuery)
+}
+
+// handleWithQuery is the internal handler that accepts a custom query string.
+func (h *ProxyHandler) handleWithQuery(c *gin.Context, upstreamPath string, ttl time.Duration, rawQuery string) {
 	ctx := c.Request.Context()
 
 	// ── 1. Build cache key ───────────────────────────────────────────────────
 	cacheKey := ""
 	if ttl > 0 {
-		cacheKey = buildCacheKey(upstreamPath, c.Request.URL.RawQuery)
+		cacheKey = buildCacheKey(upstreamPath, rawQuery)
 	}
 
 	// ── 2. Cache lookup ──────────────────────────────────────────────────────
@@ -68,7 +101,7 @@ func (h *ProxyHandler) handle(c *gin.Context, upstreamPath string, ttl time.Dura
 	}
 
 	// ── 3 / 4. Call upstream ─────────────────────────────────────────────────
-	body, err := h.client.Do(ctx, upstreamPath, c.Request.URL.RawQuery)
+	body, err := h.client.Do(ctx, upstreamPath, rawQuery)
 	if err != nil {
 		// ── 5. Stale fallback ─────────────────────────────────────────────
 		if ttl > 0 {

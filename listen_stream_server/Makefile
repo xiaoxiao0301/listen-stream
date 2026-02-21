@@ -22,19 +22,19 @@ clean-ports:
 # ── Individual service hot-reload targets ──────────────────────────────────────
 
 ## auth-svc  :8001  (JWT, SMS, login)
-auth: clean-ports
+auth:
 	air -c .air.auth-svc.toml
 
 ## proxy-svc :8002  (music API proxy + cache)
-proxy: clean-ports
+proxy:
 	air -c .air.proxy-svc.toml
 
 ## sync-svc  :8003  (WebSocket, favorites, history)
-sync: clean-ports
+sync:
 	air -c .air.sync-svc.toml
 
 ## admin-svc :8004  (admin panel backend)
-admin: clean-ports
+admin:
 	air -c .air.admin-svc.toml
 
 # ── Combined dev target ────────────────────────────────────────────────────────

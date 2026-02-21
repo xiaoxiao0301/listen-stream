@@ -11,7 +11,7 @@ class RankingDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rankingAsync = ref.watch(rankingDetailProvider((topId: int.parse(topId), page: 1)));
+    final rankingAsync = ref.watch(rankingDetailProvider((topId: int.parse(topId), page: 1, period: null)));
 
     return Scaffold(
       body: rankingAsync.when(
