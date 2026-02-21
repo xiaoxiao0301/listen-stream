@@ -74,7 +74,6 @@ class _MvListPageState extends ConsumerState<MvListPage> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => NetworkErrorState(
-          message: '加载失败',
           onRetry: () => ref.invalidate(mvCategoriesProvider),
         ),
       ),
@@ -142,10 +141,9 @@ class _MvListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mvListAsync = ref.watch(
       mvListProvider({
-        'area': area,
-        'version': version,
+        'areaId': area.toString(),
+        'typeId': version.toString(),
         'page': 1,
-        'size': 40,
       }),
     );
 
@@ -300,12 +298,10 @@ class _MvListView extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => NetworkErrorState(
-        message: '加载失败',
         onRetry: () => ref.invalidate(mvListProvider({
-              'area': area,
-              'version': version,
+              'areaId': area.toString(),
+              'typeId': version.toString(),
               'page': 1,
-              'size': 40,
             })),
       ),
     );

@@ -181,7 +181,7 @@ class AdaptiveContainer extends StatelessWidget {
 ///   ],
 /// )
 /// ```
-class ResponsiveGrid extends StatelessWidget {
+class ResponsiveGridView extends StatelessWidget {
   final List<Widget> children;
   final int? mobileColumns;
   final int? tabletColumns;
@@ -191,7 +191,7 @@ class ResponsiveGrid extends StatelessWidget {
   final double runSpacing;
   final EdgeInsetsGeometry? padding;
 
-  const ResponsiveGrid({
+  const ResponsiveGridView({
     super.key,
     required this.children,
     this.mobileColumns = 1,

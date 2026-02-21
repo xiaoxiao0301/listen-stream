@@ -8,15 +8,14 @@ final mvCategoriesProvider = FutureProvider<Map<String, dynamic>>((ref) async {
 });
 
 /// MV列表Provider
-/// 参数: area, version, page, size
-final mvListProvider = FutureProvider.family<Map<String, dynamic>, Map<String, int>>(
+/// 参数: areaId, typeId, page
+final mvListProvider = FutureProvider.family<Map<String, dynamic>, Map<String, dynamic>>(
   (ref, params) async {
     final api = ref.read(apiServiceProvider);
     return api.getMVList(
-      area: params['area'] ?? 15,
-      version: params['version'] ?? 7,
-      page: params['page'] ?? 1,
-      size: params['size'] ?? 20,
+      areaId: params['areaId'] as String?,
+      typeId: params['typeId'] as String?,
+      page: params['page'] as int? ?? 1,
     );
   },
 );

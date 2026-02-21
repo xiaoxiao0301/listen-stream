@@ -118,7 +118,6 @@ class RankingListPage extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => NetworkErrorState(
-          message: '加载失败',
           onRetry: () => ref.invalidate(rankingListProvider),
         ),
       ),

@@ -269,7 +269,7 @@ class _TvFocusableCardState extends State<TvFocusableCard> {
                   borderRadius: widget.borderRadius,
                 ),
           transform: _isFocused
-              ? Matrix4.identity()..scale(1.05)
+              ? (Matrix4.identity()..scale(1.05))
               : Matrix4.identity(),
           child: widget.child,
         ),

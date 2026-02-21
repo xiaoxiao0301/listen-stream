@@ -7,6 +7,7 @@
 /// - 各种响应式辅助类
 library responsive;
 
+export '../design_system/breakpoints.dart';
 export 'responsive_builder.dart';
 export 'device_type_provider.dart';
 export 'responsive_value.dart';

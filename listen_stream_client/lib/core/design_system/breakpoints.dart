@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+
 /// 响应式断点配置
 /// 定义不同设备类型的屏幕宽度阈值
 class Breakpoints {
@@ -20,6 +23,20 @@ class Breakpoints {
   
   // 获取当前设备类型
   static DeviceType getDeviceType(double width) {
+    // 桌面平台（macOS/Windows/Linux）默认使用桌面布局
+    final isDesktopPlatform = !kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux);
+    
+    if (isDesktopPlatform) {
+      // 桌面平台根据窗口宽度选择 desktop/tv
+      if (width > 1440) {
+        return DeviceType.tv;
+      } else {
+        // 桌面平台默认使用 desktop 布局，提供更好的体验
+        return DeviceType.desktop;
+      }
+    }
+    
+    // 移动平台或 Web 根据宽度判断
     if (width < mobile) {
       return DeviceType.mobile;
     } else if (width < desktop) {

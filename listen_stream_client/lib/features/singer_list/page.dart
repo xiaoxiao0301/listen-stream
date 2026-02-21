@@ -89,7 +89,6 @@ class _SingerListPageState extends ConsumerState<SingerListPage> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => NetworkErrorState(
-          message: '加载失败',
           onRetry: () => ref.invalidate(singerFilterOptionsProvider),
         ),
       ),
@@ -258,7 +257,6 @@ class _SingerListView extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => NetworkErrorState(
-        message: '加载失败',
         onRetry: () => ref.invalidate(singerListProvider({
               'area': area,
               'genre': genre,

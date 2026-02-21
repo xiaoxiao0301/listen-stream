@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/responsive/responsive.dart';
+import '../../core/responsive/responsive.dart' hide ResponsiveGridView;
 import '../../shared/widgets/loading_shimmer.dart';
 import '../../shared/widgets/app_error_widget.dart';
 import '../../shared/widgets/cover_image.dart';
