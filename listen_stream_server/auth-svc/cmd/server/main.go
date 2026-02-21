@@ -70,7 +70,13 @@ func main() {
 	jwtSvc := service.NewJWTService(cfgSvc)
 	smsAdapter, err := sms.NewAdapter(context.Background(), cfgSvc)
 	if err != nil {
-		logger.Fatal("init SMS adapter", zap.Error(err))
+		// SMS_PROVIDER not yet configured — fall back to dev-log adapter so
+		// the login flow works out of the box during local development.
+		// Verification codes will be printed to the auth-svc log instead of
+		// being delivered via SMS.
+		// For production, set SMS_PROVIDER=aliyun|tencent in the admin panel.
+		logger.Warn("SMS adapter init failed, falling back to dev-log adapter (set SMS_PROVIDER in admin panel for production)", zap.Error(err))
+		smsAdapter = sms.DevLogAdapter{}
 	}
 	smsSvc := service.NewSMSService(smsAdapter, rdbClient, logger)
 	authHandler := handler.NewAuthHandler(jwtSvc, smsSvc, querier, rdbClient, cfgSvc, logger)
@@ -78,6 +84,7 @@ func main() {
 	// ── 7. HTTP routes ─────────────────────────────────────────────────────────
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
 	authHandler.Register(r.Group("/auth"))
 
 	// ── 8. Serve ───────────────────────────────────────────────────────────────

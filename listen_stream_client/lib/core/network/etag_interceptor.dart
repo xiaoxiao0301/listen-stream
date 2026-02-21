@@ -1,21 +1,28 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:isar/isar.dart';
+import 'package:sqflite/sqflite.dart';
 
-import '../../data/local/isar_service.dart';
 import '../../data/local/etag_cache.dart';
+import '../../data/local/isar_service.dart';
 
 /// Attaches If-None-Match to requests and transparently converts 304 → 200.
 ///
-/// On 304: reads the cached body from Isar and returns it as a 200 response.
-/// Requires [ETagCache] Isar collection.
+/// On 304: reads the cached body from SQLite and returns it as a 200 response.
 class ETagInterceptor extends Interceptor {
-  ETagInterceptor({required this.isar});
-  final Isar isar;
+  Database get _db => IsarService.instance;
 
-  String _key(RequestOptions opts) =>
-      '${opts.method}:${opts.uri}';
+  String _key(RequestOptions opts) => '${opts.method}:${opts.uri}';
+
+  Future<ETagCache?> _find(String key) async {
+    final rows = await _db.query(
+      'etag_cache',
+      where: 'key = ?',
+      whereArgs: [key],
+      limit: 1,
+    );
+    return rows.isEmpty ? null : ETagCache.fromMap(rows.first);
+  }
 
   @override
   Future<void> onRequest(
@@ -23,7 +30,7 @@ class ETagInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final key = _key(options);
-    final cached = await isar.eTagCaches.where().keyEqualTo(key).findFirst();
+    final cached = await _find(key);
     if (cached != null && cached.etag.isNotEmpty) {
       options.headers['If-None-Match'] = cached.etag;
     }
@@ -38,7 +45,7 @@ class ETagInterceptor extends Interceptor {
     if (response.statusCode == 304) {
       // Return the previously cached body as a 200 response.
       final key = _key(response.requestOptions);
-      final cached = await isar.eTagCaches.where().keyEqualTo(key).findFirst();
+      final cached = await _find(key);
       if (cached != null) {
         handler.resolve(Response(
           requestOptions: response.requestOptions,
@@ -53,22 +60,39 @@ class ETagInterceptor extends Interceptor {
     final etag = response.headers.value('etag');
     if (etag != null && response.statusCode == 200) {
       final key = _key(response.requestOptions);
-      await isar.writeTxn(() async {
-        final existing = await isar.eTagCaches.where().keyEqualTo(key).findFirst();
-        if (existing != null) {
-          existing.etag = etag;
-          existing.body = jsonEncode(response.data);
-          existing.updatedAt = DateTime.now();
-          await isar.eTagCaches.put(existing);
-        } else {
-          await isar.eTagCaches.put(ETagCache()
-            ..key = key
-            ..etag = etag
-            ..body = jsonEncode(response.data)
-            ..updatedAt = DateTime.now());
-        }
-      });
+      final record = ETagCache(
+        key: key,
+        etag: etag,
+        body: jsonEncode(response.data),
+        updatedAt: DateTime.now(),
+      );
+      await _db.insert(
+        'etag_cache',
+        record.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
     handler.next(response);
+  }
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    // Handle 304 in error case (if validateStatus didn't accept it)
+    if (err.response?.statusCode == 304) {
+      final key = _key(err.requestOptions);
+      final cached = await _find(key);
+      if (cached != null) {
+        handler.resolve(Response(
+          requestOptions: err.requestOptions,
+          statusCode: 200,
+          data: jsonDecode(cached.body),
+        ));
+        return;
+      }
+    }
+    handler.next(err);
   }
 }

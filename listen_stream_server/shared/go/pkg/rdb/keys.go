@@ -28,6 +28,14 @@ func KeySMSLimit(phone string) string {
 	return fmt.Sprintf("sms:limit:%s", phone)
 }
 
+// KeyDevSMSLog is a Redis sorted set that stores the last 200 SMS verification
+// codes sent in dev mode. Score is Unix millis; each member is a JSON string
+// {"phone":"...","code":"...","sent_at":"..."}.
+// Only written by DevLogAdapter; read by admin-svc for the SMS Logs panel.
+func KeyDevSMSLog() string {
+	return "sms:dev:log"
+}
+
 // ── Proxy Cache ──────────────────────────────────────────────
 
 // KeyProxyCache is the Redis key for a cached third-party API response.

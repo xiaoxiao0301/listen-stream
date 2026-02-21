@@ -69,18 +69,26 @@ func main() {
 	// ── 7. HTTP routes ─────────────────────────────────────────────────────────
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
+
+	// Reverse proxy for auth-svc: forward /auth/* and /user/* to localhost:8001
+	authURL := envOr("AUTH_SERVICE_URL", "http://localhost:8001")
+	r.Any("/auth/*path", proxyToService(authURL, logger))
+	r.Any("/user/*path", proxyToService(authURL, logger))
 
 	api := r.Group("/api", proxymw.RequireUser(cfgSvc))
 	{
-		handler.NewRecommendHandler(proxyHandler).Register(api)
-		handler.NewPlaylistHandler(proxyHandler).Register(api)
-		handler.NewSingerHandler(proxyHandler).Register(api)
-		handler.NewRankingHandler(proxyHandler).Register(api)
-		handler.NewRadioHandler(proxyHandler).Register(api)
-		handler.NewMVHandler(proxyHandler).Register(api)
-		handler.NewAlbumHandler(proxyHandler).Register(api)
-		handler.NewSearchHandler(proxyHandler).Register(api)
-		handler.NewLyricHandler(proxyHandler).Register(api)
+		// Recommend endpoints under /api/recommend/*
+		handler.NewRecommendHandler(proxyHandler).Register(api.Group("/recommend"))
+		// Each resource gets its own sub-group to avoid path conflicts
+		handler.NewPlaylistHandler(proxyHandler).Register(api.Group("/playlist"))
+		handler.NewSingerHandler(proxyHandler).Register(api.Group("/artist"))
+		handler.NewRankingHandler(proxyHandler).Register(api.Group("/ranking"))
+		handler.NewRadioHandler(proxyHandler).Register(api.Group("/radio"))
+		handler.NewMVHandler(proxyHandler).Register(api.Group("/mv"))
+		handler.NewAlbumHandler(proxyHandler).Register(api.Group("/album"))
+		handler.NewSearchHandler(proxyHandler).Register(api.Group("/search"))
+		handler.NewLyricHandler(proxyHandler).Register(api.Group("/lyric"))
 	}
 
 	// ── 8. Serve ───────────────────────────────────────────────────────────────
@@ -119,4 +127,66 @@ func envOr(key, def string) string {
 		return v
 	}
 	return def
+}
+
+// proxyToService creates a reverse proxy handler that forwards requests to a backend service.
+func proxyToService(targetURL string, logger *zap.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Build target URL: targetURL + original path + query
+		path := c.Param("path")
+		fullPath := c.Request.URL.Path[:len(c.Request.URL.Path)-len(path)] + path
+		targetReq := targetURL + fullPath
+		if c.Request.URL.RawQuery != "" {
+			targetReq += "?" + c.Request.URL.RawQuery
+		}
+
+		// Create proxy request
+		req, err := http.NewRequestWithContext(c.Request.Context(), c.Request.Method, targetReq, c.Request.Body)
+		if err != nil {
+			logger.Error("proxy: create request", zap.Error(err))
+			c.JSON(http.StatusBadGateway, gin.H{"code": "PROXY_ERROR"})
+			return
+		}
+
+		// Copy headers
+		for k, vv := range c.Request.Header {
+			for _, v := range vv {
+				req.Header.Add(k, v)
+			}
+		}
+
+		// Forward request
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Do(req)
+		if err != nil {
+			logger.Error("proxy: forward request", zap.Error(err), zap.String("target", targetReq))
+			c.JSON(http.StatusBadGateway, gin.H{"code": "SERVICE_UNAVAILABLE"})
+			return
+		}
+		defer resp.Body.Close()
+
+		// Copy response headers
+		for k, vv := range resp.Header {
+			for _, v := range vv {
+				c.Writer.Header().Add(k, v)
+			}
+		}
+
+		// Copy response status and body
+		c.Status(resp.StatusCode)
+		_, _ = c.Writer.Write(mustReadAll(resp.Body))
+	}
+}
+
+func mustReadAll(r interface{ Read([]byte) (int, error) }) []byte {
+	buf := make([]byte, 0, 4096)
+	tmp := make([]byte, 1024)
+	for {
+		n, err := r.Read(tmp)
+		buf = append(buf, tmp[:n]...)
+		if err != nil {
+			break
+		}
+	}
+	return buf
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/subtle"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -61,6 +62,7 @@ type SMSService struct {
 	adapter sms.Adapter
 	rdb     *rdb.Client
 	log     *zap.Logger
+	devMode bool // true when using DevLogAdapter — codes are stored in Redis for admin panel
 }
 
 // NewSMSService creates an SMSService.
@@ -69,6 +71,7 @@ func NewSMSService(adapter sms.Adapter, rdbClient *rdb.Client, log *zap.Logger) 
 		adapter: adapter,
 		rdb:     rdbClient,
 		log:     log,
+		devMode: sms.IsDevMode(adapter),
 	}
 }
 
@@ -111,7 +114,26 @@ func (s *SMSService) SendCode(ctx context.Context, phone string) error {
 	}
 
 	s.log.Info("sms: code sent", zap.String("phone", phone))
+
+	// In dev mode, write to the admin-visible sorted set so the SMS Logs panel can show the code.
+	if s.devMode {
+		s.writeDevLog(ctx, phone, code)
+	}
+
 	return nil
+}
+
+// writeDevLog appends a sent code to the Redis sorted-set ring buffer read by the admin panel.
+func (s *SMSService) writeDevLog(ctx context.Context, phone, code string) {
+	now := time.Now().UTC()
+	entry, _ := json.Marshal(map[string]string{
+		"phone":   phone,
+		"code":    code,
+		"sent_at": now.Format(time.RFC3339),
+	})
+	if err := s.rdb.ZAddTrim(ctx, rdb.KeyDevSMSLog(), float64(now.UnixMilli()), string(entry), 200); err != nil {
+		s.log.Warn("sms: dev log write failed", zap.Error(err))
+	}
 }
 
 // VerifyCode validates the one-time code and removes it from Redis on success.

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/auth_notifier.dart';
 import '../auth/token_store.dart';
 
 /// Injects Authorization header and handles 401 → token-refresh → retry.
@@ -74,8 +75,8 @@ class AuthInterceptor extends Interceptor {
       );
       final data = resp.data!;
       await tokenStore.saveTokens(
-        at: data['accessToken'] as String,
-        rt: data['refreshToken'] as String,
+        at: data['access_token'] as String,
+        rt: data['refresh_token'] as String,
         deviceId: deviceId,
         userId: await tokenStore.getUserId() ?? '',
       );
@@ -94,10 +95,7 @@ class AuthInterceptor extends Interceptor {
   }
 
   void _forceLogout(DioException err, ErrorInterceptorHandler handler) {
-    // Trigger logout via AuthNotifier (circular dep avoided via Ref.read).
-    // The actual import is deferred to avoid circular dependency at startup.
-    // In production, read the notifier here:
-    // ref.read(authNotifierProvider.notifier).logout();
+    ref.read(authNotifierProvider.notifier).logout(message: '登录已过期，请重新登录');
     handler.next(err);
   }
 }

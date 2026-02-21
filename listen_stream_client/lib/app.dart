@@ -4,18 +4,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/auth/auth_notifier.dart';
+import 'core/auth/auth_state.dart';
 import 'features/auth/page.dart';
 import 'features/home/page.dart';
 import 'features/library/page.dart';
 import 'features/player/page.dart';
 import 'features/singer/page.dart';
+import 'features/playlist/page.dart';
+import 'features/album/page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
 
+/// A [ChangeNotifier] that fires whenever the auth state changes,
+/// used as [GoRouter.refreshListenable] so the router re-evaluates
+/// its redirect without being recreated.
+class _AuthChangeNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
+
+final _authListenable = Provider<_AuthChangeNotifier>((ref) {
+  final notifier = _AuthChangeNotifier();
+  ref.listen<AsyncValue<AuthState>>(authNotifierProvider, (_, __) {
+    notifier.notify();
+  });
+  ref.onDispose(notifier.dispose);
+  return notifier;
+});
+
 final _router = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authNotifierProvider);
   return GoRouter(
+    refreshListenable: ref.read(_authListenable),
     redirect: (context, state) {
+      final authState = ref.read(authNotifierProvider);
       final isLoggedIn = authState.valueOrNull?.isAuthenticated ?? false;
       final isLoginRoute = state.matchedLocation == '/login';
       if (!isLoggedIn && !isLoginRoute) return '/login';
@@ -31,6 +51,14 @@ final _router = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/singer/:mid',
             builder: (_, state) => SingerDetailPage(mid: state.pathParameters['mid']!),
+          ),
+          GoRoute(
+            path: '/playlist/:id',
+            builder: (_, state) => PlaylistDetailPage(playlistId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/album/:mid',
+            builder: (_, state) => AlbumDetailPage(albumMid: state.pathParameters['mid']!),
           ),
           GoRoute(path: '/library', builder: (_, __) => const LibraryPage()),
           GoRoute(path: '/player', builder: (_, __) => const PlayerPage()),

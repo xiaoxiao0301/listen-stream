@@ -119,6 +119,36 @@ func (c *Client) ScanDel(ctx context.Context, pattern string) (int64, error) {
 	return total, nil
 }
 
+// ── Sorted Sets ──────────────────────────────────────────────────────────────
+
+// ZAddTrim atomically adds member with score to a sorted set, then trims the
+// set to keep at most maxLen members (highest scores). Typical use: append-only
+// event rings where only the latest N entries are needed.
+func (c *Client) ZAddTrim(ctx context.Context, key string, score float64, member string, maxLen int64) error {
+	pipe := c.rdb.Pipeline()
+	pipe.ZAdd(ctx, key, goredis.Z{Score: score, Member: member})
+	// Keep only the highest maxLen members by score (ZREMRANGEBYRANK 0 -(maxLen+1))
+	pipe.ZRemRangeByRank(ctx, key, 0, -(maxLen + 1))
+	_, err := pipe.Exec(ctx)
+	return err
+}
+
+// ZRevRange returns members of a sorted set in descending score order,
+// from index start to stop (0-based, inclusive; -1 means last).
+func (c *Client) ZRevRange(ctx context.Context, key string, start, stop int64) ([]string, error) {
+	return c.rdb.ZRevRange(ctx, key, start, stop).Result()
+}
+
+// ZCard returns the number of members in a sorted set.
+func (c *Client) ZCard(ctx context.Context, key string) (int64, error) {
+	return c.rdb.ZCard(ctx, key).Result()
+}
+
+// ZDel removes all members from a sorted set by deleting the key entirely.
+func (c *Client) ZDel(ctx context.Context, key string) error {
+	return c.rdb.Del(ctx, key).Err()
+}
+
 // ── Pub/Sub ───────────────────────────────────────────────────────────────────
 
 // Publish sends a message to a channel. Fire-and-forget; errors are logged

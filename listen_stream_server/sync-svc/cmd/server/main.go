@@ -20,14 +20,14 @@ import (
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 
+	"listen-stream/shared/pkg/config"
+	"listen-stream/shared/pkg/crypto"
+	"listen-stream/shared/pkg/rdb"
 	"listen-stream/sync-svc/internal/cron"
 	"listen-stream/sync-svc/internal/handler"
 	syncmw "listen-stream/sync-svc/internal/middleware"
 	"listen-stream/sync-svc/internal/repo"
 	"listen-stream/sync-svc/internal/ws"
-	"listen-stream/shared/pkg/config"
-	"listen-stream/shared/pkg/crypto"
-	"listen-stream/shared/pkg/rdb"
 )
 
 func main() {
@@ -82,6 +82,7 @@ func main() {
 	// ── 7. HTTP routes ─────────────────────────────────────────────────────────
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
 
 	// WebSocket endpoint (auth via JWT — Bearer or ?token= — using same RequireUser middleware)
 	wsHandler := ws.NewWSHandler(hub, cfgSvc, logger)
@@ -90,11 +91,12 @@ func main() {
 
 	api := r.Group("/api", syncmw.RequireUser(cfgSvc))
 	{
-		handler.NewFavoritesHandler(base).Register(api)
-		handler.NewHistoryHandler(base).Register(api)
-		handler.NewPlaylistHandler(base).Register(api)
-		handler.NewSyncHandler(base).Register(api)
-		handler.NewDeviceHandler(base).Register(api)
+		// Each handler gets its own sub-group to avoid path conflicts
+		handler.NewFavoritesHandler(base).Register(api.Group("/favorites"))
+		handler.NewHistoryHandler(base).Register(api.Group("/history"))
+		handler.NewPlaylistHandler(base).Register(api.Group("/playlists"))
+		handler.NewSyncHandler(base).Register(api.Group("/sync"))
+		handler.NewDeviceHandler(base).Register(api.Group("/devices"))
 	}
 
 	// ── 8. Serve ───────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ import (
 
 const (
 	cfgAPIBaseURL = "API_BASE_URL"
+	cfgAPIKey     = "API_KEY"
 	cfgCookie     = "COOKIE"
 )
 
@@ -35,7 +36,7 @@ func New(cfgSvc config.Service) *Client {
 // Do sends a GET request to {baseURL}{path}?{rawQuery} with the configured
 // Cookie header and returns the response body bytes.
 func (c *Client) Do(ctx context.Context, path, rawQuery string) ([]byte, error) {
-	keys, err := c.cfgSvc.GetMany(ctx, []string{cfgAPIBaseURL, cfgCookie})
+	keys, err := c.cfgSvc.GetMany(ctx, []string{cfgAPIBaseURL, cfgAPIKey, cfgCookie})
 	if err != nil {
 		return nil, fmt.Errorf("upstream: read config: %w", err)
 	}
@@ -49,6 +50,9 @@ func (c *Client) Do(ctx context.Context, path, rawQuery string) ([]byte, error) 
 	}
 	if cookie := keys[cfgCookie]; cookie != "" {
 		req.Header.Set("Cookie", cookie)
+	}
+	if apiKey := keys[cfgAPIKey]; apiKey != "" {
+		req.Header.Set("X-Api-Key", apiKey)
 	}
 	req.Header.Set("User-Agent", "listen-stream/1.0")
 	resp, err := c.cli.Do(req)

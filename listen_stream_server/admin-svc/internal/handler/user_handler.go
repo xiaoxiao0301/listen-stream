@@ -24,8 +24,26 @@ func NewUserHandler(b *Base) *UserHandler { return &UserHandler{b} }
 func (h *UserHandler) Register(rg *gin.RouterGroup) {
 	auth := mw.RequireAdmin(h.jwtSvc)
 	rg.GET("", auth, h.listUsers)
+	rg.GET("/:id/devices", auth, h.listUserDevices)
 	rg.PUT("/:id/role", auth, mw.RequireRole("SUPER_ADMIN"), h.setUserRole)
 	rg.PUT("/:id/status", auth, h.setUserStatus)
+}
+
+// listUserDevices returns all devices registered for a user.
+//
+//	GET /admin/users/:id/devices
+func (h *UserHandler) listUserDevices(c *gin.Context) {
+	userID := c.Param("id")
+	devices, err := h.q.ListUserDevices(c.Request.Context(), userID)
+	if err != nil {
+		h.log.Error("list user devices", zap.String("user", userID), zap.Error(err))
+		jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
+		return
+	}
+	if devices == nil {
+		devices = []repo.Device{}
+	}
+	c.JSON(http.StatusOK, gin.H{"data": devices})
 }
 
 // listUsers returns a paginated, phone-filterable user list.

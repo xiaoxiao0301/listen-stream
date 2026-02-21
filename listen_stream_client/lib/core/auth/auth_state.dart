@@ -1,7 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-// Simple sealed class without freezed to keep deps minimal.
-
 /// Sealed auth state.
 abstract class AuthState {
   const AuthState();

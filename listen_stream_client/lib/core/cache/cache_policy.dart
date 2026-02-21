@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar/isar.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../data/local/cached_response.dart';
 import '../../data/local/isar_service.dart';
@@ -16,7 +16,17 @@ final cachePolicyProvider = Provider<CachePolicy>((ref) => CachePolicy());
 ///   1. Cached value immediately (even if stale) — fast first paint.
 ///   2. Network response once available — seamless data refresh.
 class CachePolicy {
-  Isar get _isar => IsarService.instance;
+  Database get _db => IsarService.instance;
+
+  Future<CachedResponse?> _find(String cacheKey) async {
+    final rows = await _db.query(
+      'cached_responses',
+      where: 'cache_key = ?',
+      whereArgs: [cacheKey],
+      limit: 1,
+    );
+    return rows.isEmpty ? null : CachedResponse.fromMap(rows.first);
+  }
 
   /// Standard stale-while-revalidate fetch.
   Stream<CacheResult<T>> fetch<T>({
@@ -26,7 +36,7 @@ class CachePolicy {
     required T Function(Map<String, dynamic>) fromJson,
   }) async* {
     // 1. Emit cached data immediately.
-    final cached = await _isar.cachedResponses.where().cacheKeyEqualTo(cacheKey).findFirst();
+    final cached = await _find(cacheKey);
     if (cached != null) {
       yield CacheResult<T>(
         data: fromJson(jsonDecode(cached.body) as Map<String, dynamic>),
@@ -56,22 +66,25 @@ class CachePolicy {
 
   /// Invalidate a specific cache entry.
   Future<void> invalidate(String cacheKey) async {
-    await _isar.writeTxn(() async {
-      final existing = await _isar.cachedResponses.where().cacheKeyEqualTo(cacheKey).findFirst();
-      if (existing != null) await _isar.cachedResponses.delete(existing.id);
-    });
+    await _db.delete(
+      'cached_responses',
+      where: 'cache_key = ?',
+      whereArgs: [cacheKey],
+    );
   }
 
   Future<void> _persist<T>(String cacheKey, T data, int ttlSeconds) async {
-    await _isar.writeTxn(() async {
-      final existing = await _isar.cachedResponses.where().cacheKeyEqualTo(cacheKey).findFirst();
-      final record = (existing ?? CachedResponse())
-        ..cacheKey  = cacheKey
-        ..body      = jsonEncode(data)
-        ..etag      = ''
-        ..cachedAt  = DateTime.now()
-        ..ttlSeconds = ttlSeconds;
-      await _isar.cachedResponses.put(record);
-    });
+    final record = CachedResponse(
+      cacheKey: cacheKey,
+      body: jsonEncode(data),
+      etag: '',
+      cachedAt: DateTime.now(),
+      ttlSeconds: ttlSeconds,
+    );
+    await _db.insert(
+      'cached_responses',
+      record.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }

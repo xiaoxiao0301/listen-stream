@@ -51,7 +51,8 @@ class _SingerDetailState extends ConsumerState<_SingerDetail> {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(singer['name'] as String? ?? ''),
                 background: singer['pic'] != null
-                    ? Image.network(singer['pic'] as String, fit: BoxFit.cover)
+                    ? Image.network(singer['pic'] as String, fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1a1a2e)))
                     : null,
               ),
               bottom: TabBar(

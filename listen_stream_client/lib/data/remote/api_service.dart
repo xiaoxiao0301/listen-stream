@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../local/cached_response.dart';
 import '../../core/network/network_client.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -31,6 +30,10 @@ class ApiService {
       (await _dio.get<Map<String, dynamic>>('/api/recommend/new-albums')).data!;
   Future<Map<String, dynamic>> getRecommendDaily() async =>
       (await _dio.get<Map<String, dynamic>>('/api/recommend/daily')).data!;
+
+  // ── Proxy: Playlist ─────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getPlaylistDetail(String id) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/playlist/detail', queryParameters: {'id': id})).data!;
 
   // ── Proxy: Singer ───────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getSingerFilterList(Map<String, dynamic> params) async =>

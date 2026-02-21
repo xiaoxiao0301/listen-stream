@@ -30,8 +30,6 @@ class WsClient {
   DateTime? _lastSyncTime;
   bool _userDisconnected = false;
 
-  static const _maxRetryDelay = Duration(seconds: 30);
-
   /// Connect (called after successful login).
   Future<void> connect() async {
     _userDisconnected = false;
@@ -151,6 +149,7 @@ class WsClient {
 
   void _cancel() {
     _reconnectTimer?.cancel();
+    _backgroundTimer?.cancel();
     _sub?.cancel();
     _channel?.sink.close();
     _channel = null;
@@ -166,7 +165,7 @@ class WsEvent {
 
 /// Minimal app-lifecycle observer for WsClient.
 class _LifecycleObserver extends WidgetsBindingObserver {
-  const _LifecycleObserver({required this.onResume, required this.onPause});
+  _LifecycleObserver({required this.onResume, required this.onPause});
   final VoidCallback onResume;
   final VoidCallback onPause;
 

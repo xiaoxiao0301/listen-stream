@@ -25,7 +25,9 @@ func NewAdapter(ctx context.Context, cfgSvc config.Service) (Adapter, error) {
 		return NewAliyunAdapter(cfgSvc), nil
 	case "tencent":
 		return NewTencentAdapter(cfgSvc), nil
+	case "dev", "log", "":
+		return DevLogAdapter{}, nil
 	default:
-		return nil, fmt.Errorf("sms factory: unknown SMS_PROVIDER %q (supported: aliyun, tencent)", provider)
+		return nil, fmt.Errorf("sms factory: unknown SMS_PROVIDER %q (supported: aliyun, tencent, dev)", provider)
 	}
 }

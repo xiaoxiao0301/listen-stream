@@ -7,10 +7,14 @@ FROM golang:1.23-alpine AS builder
 
 WORKDIR /src
 COPY go.work go.work.sum ./
+COPY vendor/ vendor/
 COPY shared/go/ shared/go/
 COPY auth-svc/ auth-svc/
+COPY proxy-svc/ proxy-svc/
+COPY sync-svc/ sync-svc/
+COPY admin-svc/ admin-svc/
 
-RUN go build -o /bin/auth-svc ./auth-svc/cmd/server
+RUN go build -mod=vendor -o /bin/auth-svc ./auth-svc/cmd/server
 
 # ── Runtime ───────────────────────────────────────────────────────────────────
 FROM alpine:3.20

@@ -32,6 +32,13 @@ listen_stream_server/**/*.test
 listen_stream_server/**/*.out
 # compiled binaries（multi-stage Docker 不会产生，本地 go build 会）
 listen_stream_server/bin/
+listen_stream_server/tmp/
+listen_stream_server/server
+listen_stream_server/*/tmp/
+listen_stream_server/auth-svc/auth-svc
+listen_stream_server/proxy-svc/proxy-svc
+listen_stream_server/sync-svc/sync-svc
+listen_stream_server/admin-svc/admin-svc
 
 # ── Flutter ───────────────────────────────────────────────────────────────────
 listen_stream_client/.dart_tool/

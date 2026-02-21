@@ -59,11 +59,30 @@ enum PlayStatus { idle, loading, playing, paused, error }
 /// - Reports progress every 10 s via POST /user/progress.
 /// - Supports cross-device resume via GET /user/progress.
 class PlaybackService {
-  PlaybackService(this._ref);
+  PlaybackService(this._ref) {
+    // Begin AudioService initialization immediately; operations that need
+    // the handler await [_ready] before proceeding.
+    _ready = _initHandler();
+  }
   final Ref _ref;
 
-  late final ListenStreamAudioHandler _handler;
-  AudioPlayer get _player => _handler.player;
+  late Future<void> _ready;
+  ListenStreamAudioHandler? _handler;
+  AudioPlayer get _player => _handler!.player;
+
+  /// Public access to the audio handler (available after first [playSong]).
+  ListenStreamAudioHandler get handler => _handler!;
+
+  Future<void> _initHandler() async {
+    _handler = await AudioService.init(
+      builder: () => ListenStreamAudioHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.listenstream.audio',
+        androidNotificationChannelName: 'Listen Stream',
+        androidNotificationOngoing: true,
+      ),
+    );
+  }
 
   PlayQueue _queue = const PlayQueue(songs: [], currentIndex: 0);
   PlayMode _mode = PlayMode.sequence;
@@ -75,17 +94,10 @@ class PlaybackService {
   Song? get currentSong =>
       _queue.songs.isEmpty ? null : _queue.songs[_queue.currentIndex];
 
-  /// Initialize (called once from main after WidgetsFlutterBinding.ensureInitialized).
+  /// Initialize (kept for API compatibility; init now happens in constructor).
   static Future<PlaybackService> create(Ref ref) async {
     final svc = PlaybackService(ref);
-    svc._handler = await AudioService.init(
-      builder: () => ListenStreamAudioHandler(),
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.listenstream.audio',
-        androidNotificationChannelName: 'Listen Stream',
-        androidNotificationOngoing: true,
-      ),
-    );
+    await svc._ready;
     return svc;
   }
 
@@ -140,12 +152,13 @@ class PlaybackService {
   }
 
   Future<void> _loadAndPlay(Song song) async {
+    await _ready; // ensure AudioService.init has completed
     _stopProgressTimer();
     final api = _ref.read(apiServiceProvider);
     // Always fetch fresh URL — never use cache.
     final url = await api.getSongUrl(song.mid);
     final mediaItem = song.toMediaItem(url);
-    await _handler.playMediaItem(mediaItem);
+    await _handler!.playMediaItem(mediaItem);
     _startProgressTimer(song.mid);
   }
 

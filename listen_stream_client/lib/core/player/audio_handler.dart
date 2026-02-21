@@ -11,7 +11,7 @@ class ListenStreamAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   ListenStreamAudioHandler() {
     // Forward just_audio playback state to audio_service.
-    _player.playbackEventStream.listen(_broadcastState);
+    player.playbackEventStream.listen(_broadcastState);
   }
 
   final AudioPlayer player = AudioPlayer();

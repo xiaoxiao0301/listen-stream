@@ -12,7 +12,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
-	"regexp"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -21,8 +21,27 @@ import (
 	svc "listen-stream/admin-svc/internal/service"
 )
 
-// strongPasswordRe enforces: ≥12 chars, uppercase, lowercase, digit, special char.
-var strongPasswordRe = regexp.MustCompile(`^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{12,}$`)
+// isStrongPassword checks: ≥12 chars, has uppercase, lowercase, digit, and special char.
+// Go's regexp uses RE2 which does not support lookaheads, so we validate manually.
+func isStrongPassword(s string) bool {
+	if len(s) < 12 {
+		return false
+	}
+	var hasUpper, hasLower, hasDigit, hasSpecial bool
+	for _, r := range s {
+		switch {
+		case unicode.IsUpper(r):
+			hasUpper = true
+		case unicode.IsLower(r):
+			hasLower = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		case !unicode.IsLetter(r) && !unicode.IsDigit(r):
+			hasSpecial = true
+		}
+	}
+	return hasUpper && hasLower && hasDigit && hasSpecial
+}
 
 // SetupHandler handles system initialization endpoints.
 type SetupHandler struct{ *Base }
@@ -78,7 +97,7 @@ func (h *SetupHandler) init_(c *gin.Context) {
 	}
 
 	// 1. Password strength check
-	if !strongPasswordRe.MatchString(req.Password) {
+	if !isStrongPassword(req.Password) {
 		jsonErr(c, http.StatusBadRequest, "WEAK_PASSWORD",
 			"password must be ≥12 chars and contain uppercase, lowercase, digit, and special char")
 		return
@@ -100,8 +119,11 @@ func (h *SetupHandler) init_(c *gin.Context) {
 
 	// 3. Write all configs to DB
 	configs := map[string]string{
-		"USER_JWT_SECRET":  userSecret,
-		"ADMIN_JWT_SECRET": adminSecret,
+		"USER_JWT_SECRET":   userSecret,
+		"ADMIN_JWT_SECRET":  adminSecret,
+		"ACCESS_TOKEN_TTL":  "7200",
+		"REFRESH_TOKEN_TTL": "2592000",
+		"MAX_DEVICES":       "5",
 	}
 	if req.SiteName != "" {
 		configs["SITE_NAME"] = req.SiteName

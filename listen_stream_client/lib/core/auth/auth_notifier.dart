@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/network_client.dart';
+import '../ws/ws_client.dart';
 import 'auth_state.dart';
 import 'token_store.dart';
 
@@ -26,26 +30,51 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     final hasTokens = await _store.hasTokens();
     if (!hasTokens) return const Unauthenticated();
     final userId = await _store.getUserId();
+    // Reconnect WS on cold start if already logged in.
+    ref.read(wsClientProvider).connect();
     return Authenticated(userId: userId ?? '');
   }
 
   /// POST /auth/sms/verify → save tokens → authenticated.
+  ///
+  /// Throws on failure so the caller can show errors in the UI.
   Future<void> loginWithSms(String phone, String code) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+    try {
       final resp = await _dio.post<Map<String, dynamic>>(
         '/auth/sms/verify',
         data: {'phone': phone, 'code': code},
       );
       final data = resp.data!;
+      final at       = data['access_token']  as String;
+      final rt       = data['refresh_token'] as String;
+      final deviceId = data['device_id']     as String;
+      final userId   = _jwtSub(at);
       await _store.saveTokens(
-        at:       data['accessToken']  as String,
-        rt:       data['refreshToken'] as String,
-        deviceId: data['deviceId']     as String,
-        userId:   data['userId']       as String,
+        at:       at,
+        rt:       rt,
+        deviceId: deviceId,
+        userId:   userId,
       );
-      return Authenticated(userId: data['userId'] as String);
-    });
+      state = AsyncData(Authenticated(userId: userId));
+      ref.read(wsClientProvider).connect();
+    } catch (e, st) {
+      debugPrint('[AuthNotifier] loginWithSms error: $e\n$st');
+      state = AsyncError(e, st);
+      rethrow; // surface the error to _submit so the UI can react
+    }
+  }
+
+  /// Decode the `sub` claim from a JWT without verifying the signature.
+  static String _jwtSub(String jwt) {
+    final parts = jwt.split('.');
+    if (parts.length < 2) return '';
+    // Base64Url-decode the payload (add padding if needed).
+    var payload = parts[1];
+    payload += '=' * ((4 - payload.length % 4) % 4);
+    final json = utf8.decode(base64Url.decode(payload));
+    final map  = jsonDecode(json) as Map<String, dynamic>;
+    return map['sub'] as String? ?? '';
   }
 
   /// Logout: fire-and-forget POST /auth/logout, then clear all local state.
@@ -56,7 +85,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     } catch (_) {}
 
     await _store.clearAll();
-    // WsClient disconnect is done by its own provider listener.
+    ref.read(wsClientProvider).disconnect();
     state = AsyncData(Unauthenticated(message));
   }
 }

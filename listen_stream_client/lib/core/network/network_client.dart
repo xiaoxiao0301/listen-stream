@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/local/isar_service.dart';
-import '../auth/token_store.dart';
 import 'auth_interceptor.dart';
 import 'etag_interceptor.dart';
 import 'retry_interceptor.dart';
@@ -23,16 +21,18 @@ class NetworkClient {
   static Dio build(Ref ref) {
     final dio = Dio(
       BaseOptions(
-        baseUrl: const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8001'),
+        baseUrl: const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8002'),
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 15),
         headers: {'Accept': 'application/json'},
+        // Accept 304 Not Modified as valid response (handled by ETagInterceptor)
+        validateStatus: (status) => status != null && status >= 200 && status < 400,
       ),
     );
 
     dio.interceptors.addAll([
       AuthInterceptor(dio: dio, ref: ref),
-      ETagInterceptor(isar: IsarService.instance),
+      ETagInterceptor(),
       RetryInterceptor(dio: dio),
       if (const bool.fromEnvironment('dart.vm.product', defaultValue: false) == false)
         LogInterceptor(requestBody: true, responseBody: true),

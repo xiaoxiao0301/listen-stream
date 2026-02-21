@@ -1,0 +1,52 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Local development stack: database + cache only.
+# Go services run locally with `air` (see Makefile → make dev).
+#
+#   make infra      # start postgres + redis
+#   make dev        # start all Go services with hot-reload
+# ─────────────────────────────────────────────────────────────────────────────
+
+networks:
+  listen-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    networks: [listen-net]
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: listen
+      POSTGRES_PASSWORD: listen
+      POSTGRES_DB: listen_stream
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U listen -d listen_stream"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks: [listen-net]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

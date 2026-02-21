@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/player/playback_service.dart';
+import '../../../core/player/playback_service.dart';
 
 /// Global D-pad / media key handler for TV (C.8).
 ///
@@ -21,7 +21,7 @@ class TvKeyHandler extends ConsumerWidget {
         final key = event.logicalKey;
 
         if (key == LogicalKeyboardKey.mediaPlayPause) {
-          final p = player._handler.player;
+          final p = player.handler.player;
           p.playing ? p.pause() : p.play();
         } else if (key == LogicalKeyboardKey.mediaTrackNext) {
           player.playNext();

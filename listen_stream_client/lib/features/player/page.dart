@@ -1,6 +1,6 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../core/player/playback_service.dart';
 
@@ -20,12 +20,12 @@ class PlayerPage extends ConsumerWidget {
         ),
       ),
       body: StreamBuilder<PlaybackEvent>(
-        stream: svc._handler.player.playbackEventStream,
+        stream: svc.handler.player.playbackEventStream,
         builder: (context, snap) {
-          final item = svc._handler.mediaItem.value;
-          final playing = svc._handler.player.playing;
-          final position = svc._handler.player.position;
-          final duration = svc._handler.player.duration ?? Duration.zero;
+          final item = svc.handler.mediaItem.value;
+          final playing = svc.handler.player.playing;
+          final position = svc.handler.player.position;
+          final duration = svc.handler.player.duration ?? Duration.zero;
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -48,7 +48,7 @@ class PlayerPage extends ConsumerWidget {
               Slider(
                 value: position.inSeconds.toDouble().clamp(0, duration.inSeconds.toDouble()),
                 max: duration.inSeconds.toDouble().clamp(1, double.infinity),
-                onChanged: (v) => svc._handler.player.seek(Duration(seconds: v.toInt())),
+                onChanged: (v) => svc.handler.player.seek(Duration(seconds: v.toInt())),
                 activeColor: Colors.white,
                 inactiveColor: Colors.white30,
               ),
@@ -63,7 +63,7 @@ class PlayerPage extends ConsumerWidget {
                   IconButton(
                     icon: Icon(playing ? Icons.pause_circle_filled : Icons.play_circle_filled,
                         color: Colors.white, size: 64),
-                    onPressed: () => playing ? svc._handler.pause() : svc._handler.play(),
+                    onPressed: () => playing ? svc.handler.pause() : svc.handler.play(),
                   ),
                   IconButton(icon: const Icon(Icons.skip_next, color: Colors.white, size: 36),
                       onPressed: svc.playNext),

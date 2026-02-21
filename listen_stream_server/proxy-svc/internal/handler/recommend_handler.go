@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // RecommendHandler serves all /api/recommend/* endpoints.
@@ -18,8 +19,8 @@ func (h *RecommendHandler) Register(rg *gin.RouterGroup) {
 	rg.GET("/banner",     h.banner)
 	rg.GET("/daily",      h.daily)
 	rg.GET("/playlist",   h.playlist)
-	rg.GET("/new/songs",  h.newSongs)
-	rg.GET("/new/albums", h.newAlbums)
+	rg.GET("/new-songs",  h.newSongs)
+	rg.GET("/new-albums", h.newAlbums)
 }
 
 func (h *RecommendHandler) banner(c *gin.Context) {

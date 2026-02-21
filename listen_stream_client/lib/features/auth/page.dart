@@ -26,7 +26,6 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
   Timer? _timer;
   String? _phoneError;
   String? _otpError;
-  String? _toast;
 
   @override
   void dispose() {
@@ -39,6 +38,8 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
 
   String get _otp => _otpControllers.map((c) => c.text).join();
 
+  String get _e164Phone => '+86${_phoneController.text.trim()}';
+
   Future<void> _sendCode() async {
     final phone = _phoneController.text.trim();
     if (phone.length != 11) {
@@ -47,18 +48,21 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
     }
     setState(() { _sending = true; _phoneError = null; });
     try {
-      await ref.read(apiServiceProvider).sendSmsCode(phone);
+      await ref.read(apiServiceProvider).sendSmsCode(_e164Phone);
+      if (!mounted) return;
       _startCountdown();
     } on Object catch (e) {
+      if (!mounted) return;
       final msg = _extractError(e);
       if (msg.contains('RATE_LIMITED')) {
         final retryAfter = _parseRetryAfter(e);
         setState(() => _phoneError = '请 $retryAfter 秒后再试');
       } else {
-        setState(() => _toast = '网络错误，请稍后重试');
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('网络错误，请稍后重试')));
       }
     } finally {
-      setState(() => _sending = false);
+      if (mounted) setState(() => _sending = false);
     }
   }
 
@@ -75,17 +79,20 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
     setState(() { _submitting = true; _otpError = null; });
     try {
       await ref.read(authNotifierProvider.notifier)
-          .loginWithSms(_phoneController.text.trim(), _otp);
+          .loginWithSms(_e164Phone, _otp);
+      // Navigation happens here — widget may already be disposed, so return early.
     } on Object catch (e) {
+      if (!mounted) return;
       final msg = _extractError(e);
       if (msg.contains('INVALID_CODE')) {
         setState(() => _otpError = '验证码错误');
       } else {
-        setState(() => _toast = '登录失败，请稍后重试');
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('登录失败，请稍后重试')));
       }
       _clearOtp();
     } finally {
-      setState(() => _submitting = false);
+      if (mounted) setState(() => _submitting = false);
     }
   }
 

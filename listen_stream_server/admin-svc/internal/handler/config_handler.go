@@ -10,14 +10,15 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
 	mw "listen-stream/admin-svc/internal/middleware"
-	"listen-stream/admin-svc/internal/util"
 	"listen-stream/admin-svc/internal/repo"
+	"listen-stream/admin-svc/internal/util"
 	"listen-stream/shared/pkg/rdb"
 )
 
@@ -37,11 +38,13 @@ func (h *ConfigHandler) Register(rg *gin.RouterGroup) {
 	rg.PUT("/jwt", auth, mw.RequireRole("SUPER_ADMIN"), h.updateJWTConfig)
 	rg.GET("/sms", auth, h.getSMSConfig)
 	rg.PUT("/sms", auth, h.updateSMSConfig)
+	rg.GET("/sms/records", auth, h.getSMSRecords)
+	rg.DELETE("/sms/records", auth, h.clearSMSRecords)
 }
 
 // ── API config ────────────────────────────────────────────────────────────────
 
-var apiConfigKeys = []string{"API_BASE_URL", "COOKIE", "APP_ID", "APP_SECRET"}
+var apiConfigKeys = []string{"API_BASE_URL", "API_KEY", "COOKIE"}
 
 func (h *ConfigHandler) getAPIConfig(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -50,7 +53,7 @@ func (h *ConfigHandler) getAPIConfig(c *gin.Context) {
 		jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "config read failed")
 		return
 	}
-	for _, k := range []string{"COOKIE", "APP_SECRET"} {
+	for _, k := range []string{"API_KEY", "COOKIE"} {
 		if v, ok := vals[k]; ok {
 			vals[k] = util.MaskSecret(v)
 		}
@@ -70,11 +73,13 @@ func (h *ConfigHandler) updateAPIConfig(c *gin.Context) {
 	if claims != nil {
 		updatedBy = claims.Username
 	}
-	allowed := map[string]bool{"API_BASE_URL": true, "COOKIE": true, "APP_ID": true, "APP_SECRET": true, "COOKIE_REFRESH_CRON": true}
+	allowed := map[string]bool{"API_BASE_URL": true, "API_KEY": true, "COOKIE": true, "COOKIE_REFRESH_CRON": true}
 	for k, v := range req {
 		if !allowed[k] {
 			continue
 		}
+		// Trim whitespace from values to prevent common input errors
+		v = strings.TrimSpace(v)
 		if err := h.cfgSvc.Set(ctx, k, v, updatedBy); err != nil {
 			h.log.Error("update api config", zap.String("key", k), zap.Error(err))
 			jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to update "+k)
@@ -91,6 +96,7 @@ func (h *ConfigHandler) testAPIConnection(c *gin.Context) {
 	ctx := c.Request.Context()
 	baseURL, _ := h.cfgSvc.Get(ctx, "API_BASE_URL")
 	cookie, _ := h.cfgSvc.Get(ctx, "COOKIE")
+	apiKey, _ := h.cfgSvc.Get(ctx, "API_KEY")
 	if baseURL == "" {
 		jsonErr(c, http.StatusBadRequest, "NOT_CONFIGURED", "API_BASE_URL is not set")
 		return
@@ -106,15 +112,18 @@ func (h *ConfigHandler) testAPIConnection(c *gin.Context) {
 	if cookie != "" {
 		req.Header.Set("Cookie", cookie)
 	}
+	if apiKey != "" {
+		req.Header.Set("X-Api-Key", apiKey)
+	}
 	resp, err := client.Do(req)
 	latency := time.Since(start).Milliseconds()
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": false, "latency_ms": latency, "error": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ok": false, "latency_ms": latency, "error": err.Error()})
 		return
 	}
 	defer resp.Body.Close()
 	c.JSON(http.StatusOK, gin.H{
-		"success":     resp.StatusCode < 400,
+		"ok":          resp.StatusCode < 400,
 		"status_code": resp.StatusCode,
 		"latency_ms":  latency,
 	})
@@ -140,13 +149,7 @@ func (h *ConfigHandler) getJWTConfig(c *gin.Context) {
 }
 
 func (h *ConfigHandler) updateJWTConfig(c *gin.Context) {
-	var req struct {
-		UserJWTSecret     string `json:"user_jwt_secret"`
-		AdminJWTSecret    string `json:"admin_jwt_secret"`
-		AccessTokenTTL    string `json:"access_token_ttl"`
-		RefreshTokenTTL   string `json:"refresh_token_ttl"`
-		MaxDevices        string `json:"max_devices"`
-	}
+	var req map[string]string
 	if err := c.ShouldBindJSON(&req); err != nil {
 		jsonErr(c, http.StatusBadRequest, "INVALID_REQUEST", err.Error())
 		return
@@ -155,48 +158,52 @@ func (h *ConfigHandler) updateJWTConfig(c *gin.Context) {
 	claims := mw.GetAdminClaims(c)
 	updatedBy := claims.Username
 
+	allowed := map[string]bool{
+		"USER_JWT_SECRET":   true,
+		"ADMIN_JWT_SECRET":  true,
+		"ACCESS_TOKEN_TTL":  true,
+		"REFRESH_TOKEN_TTL": true,
+		"MAX_DEVICES":       true,
+	}
+
 	affectedSessions := int64(0)
 
-	// Rotate USER_JWT_SECRET: revoke all RTs and broadcast WS event
-	if req.UserJWTSecret != "" {
-		if err := h.cfgSvc.Set(ctx, "USER_JWT_SECRET", req.UserJWTSecret, updatedBy); err != nil {
-			jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to rotate USER_JWT_SECRET")
-			return
-		}
-		// Bulk-delete all RT keys
-		deleted, err := h.rdb.ScanDel(ctx, "rt:*")
-		if err != nil {
-			h.log.Warn("ScanDel rt:*", zap.Error(err))
-		}
-		affectedSessions = deleted
-
-		// Broadcast config.jwt_rotated to all users via Redis pub/sub
-		go h.broadcastJWTRotated(ctx, deleted)
-
-		go auditLog(context.Background(), h.q, claims.Subject, "JWT_SECRET_ROTATED",
-			ptrStr("USER_JWT_SECRET"), ptrStr("[密钥已更换]"), ptrStr("[密钥已更换]"), c.ClientIP())
-	}
-
-	// Rotate ADMIN_JWT_SECRET (no WS push — admin sessions log back in manually)
-	if req.AdminJWTSecret != "" {
-		if err := h.cfgSvc.Set(ctx, "ADMIN_JWT_SECRET", req.AdminJWTSecret, updatedBy); err != nil {
-			jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to rotate ADMIN_JWT_SECRET")
-			return
-		}
-		go auditLog(context.Background(), h.q, claims.Subject, "JWT_ADMIN_SECRET_ROTATED",
-			ptrStr("ADMIN_JWT_SECRET"), ptrStr("[密钥已更换]"), ptrStr("[密钥已更换]"), c.ClientIP())
-	}
-
-	// Non-secret config updates
-	nonSecrets := map[string]string{
-		"ACCESS_TOKEN_TTL":  req.AccessTokenTTL,
-		"REFRESH_TOKEN_TTL": req.RefreshTokenTTL,
-		"MAX_DEVICES":       req.MaxDevices,
-	}
-	for k, v := range nonSecrets {
-		if v == "" {
+	for k, v := range req {
+		if !allowed[k] || v == "" {
 			continue
 		}
+		// Trim whitespace from values
+		v = strings.TrimSpace(v)
+
+		if k == "USER_JWT_SECRET" {
+			// Rotate USER_JWT_SECRET: revoke all RTs and broadcast WS event
+			if err := h.cfgSvc.Set(ctx, k, v, updatedBy); err != nil {
+				jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to rotate USER_JWT_SECRET")
+				return
+			}
+			deleted, err := h.rdb.ScanDel(ctx, "rt:*")
+			if err != nil {
+				h.log.Warn("ScanDel rt:*", zap.Error(err))
+			}
+			affectedSessions = deleted
+			go h.broadcastJWTRotated(ctx, deleted)
+			go auditLog(context.Background(), h.q, claims.Subject, "JWT_SECRET_ROTATED",
+				ptrStr(k), ptrStr("[密钥已更换]"), ptrStr("[密钥已更换]"), c.ClientIP())
+			continue
+		}
+
+		if k == "ADMIN_JWT_SECRET" {
+			// Rotate ADMIN_JWT_SECRET (no WS push — admin sessions log back in manually)
+			if err := h.cfgSvc.Set(ctx, k, v, updatedBy); err != nil {
+				jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to rotate ADMIN_JWT_SECRET")
+				return
+			}
+			go auditLog(context.Background(), h.q, claims.Subject, "JWT_ADMIN_SECRET_ROTATED",
+				ptrStr(k), ptrStr("[密钥已更换]"), ptrStr("[密钥已更换]"), c.ClientIP())
+			continue
+		}
+
+		// Non-secret keys (TTL, MAX_DEVICES)
 		if err := h.cfgSvc.Set(ctx, k, v, updatedBy); err != nil {
 			h.log.Error("update jwt config", zap.String("key", k), zap.Error(err))
 		}
@@ -253,10 +260,47 @@ func (h *ConfigHandler) updateSMSConfig(c *gin.Context) {
 		if !allowed[k] {
 			continue
 		}
+		// Trim whitespace from values
+		v = strings.TrimSpace(v)
 		if err := h.cfgSvc.Set(ctx, k, v, claims.Username); err != nil {
 			jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to update "+k)
 			return
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{"updated": len(req)})
+}
+
+// ── SMS dev log records ──────────────────────────────────────────────────────────────────
+
+// getSMSRecords returns the last 200 SMS codes sent in dev mode.
+// Each entry is a JSON object {phone, code, sent_at}.
+//
+//	GET /admin/config/sms/records
+func (h *ConfigHandler) getSMSRecords(c *gin.Context) {
+	ctx := c.Request.Context()
+	entries, err := h.rdb.ZRevRange(ctx, rdb.KeyDevSMSLog(), 0, 199)
+	if err != nil {
+		h.log.Error("get sms records", zap.Error(err))
+		jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
+		return
+	}
+	records := make([]map[string]string, 0, len(entries))
+	for _, e := range entries {
+		var m map[string]string
+		if err := json.Unmarshal([]byte(e), &m); err == nil {
+			records = append(records, m)
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"data": records, "total": len(records)})
+}
+
+// clearSMSRecords deletes all dev-mode SMS log entries from Redis.
+//
+//	DELETE /admin/config/sms/records
+func (h *ConfigHandler) clearSMSRecords(c *gin.Context) {
+	if err := h.rdb.ZDel(c.Request.Context(), rdb.KeyDevSMSLog()); err != nil {
+		jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"cleared": true})
 }
