@@ -31,11 +31,13 @@ class ApiService {
   Future<Map<String, dynamic>> getRecommendDaily() async =>
       (await _dio.get<Map<String, dynamic>>('/api/recommend/daily')).data!;
 
-  // ── Proxy: Playlist ─────────────────────────────────────────────────────────
-  Future<Map<String, dynamic>> getPlaylistDetail(String id) async =>
+  // ── Proxy: Playlist ─────────────────────────────────────────────────────────  Future<Map<String, dynamic>> getPlaylistCategories() async =>
+      (await _dio.get<Map<String, dynamic>>('/api/playlist/categories')).data!;  Future<Map<String, dynamic>> getPlaylistDetail(String id) async =>
       (await _dio.get<Map<String, dynamic>>('/api/playlist/detail', queryParameters: {'id': id})).data!;
 
   // ── Proxy: Singer ───────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getSingerFilterOptions() async =>
+      (await _dio.get<Map<String, dynamic>>('/api/singer/filter')).data!;
   Future<Map<String, dynamic>> getSingerFilterList(Map<String, dynamic> params) async =>
       (await _dio.get<Map<String, dynamic>>('/api/singer/list', queryParameters: params)).data!;
   Future<Map<String, dynamic>> getSingerDetail(String mid) async =>
