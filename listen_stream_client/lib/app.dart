@@ -12,6 +12,7 @@ import 'features/player/page.dart';
 import 'features/singer/page.dart';
 import 'features/playlist/page.dart';
 import 'features/album/page.dart';
+import 'features/search/page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
 
@@ -48,6 +49,7 @@ final _router = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           GoRoute(path: '/', builder: (_, __) => const HomePage()),
+          GoRoute(path: '/search', builder: (_, __) => const SearchPage()),
           GoRoute(
             path: '/singer/:mid',
             builder: (_, state) => SingerDetailPage(mid: state.pathParameters['mid']!),
@@ -112,12 +114,14 @@ class _BottomNav extends StatelessWidget {
     return NavigationBar(
       destinations: const [
         NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: '首页'),
+        NavigationDestination(icon: Icon(Icons.search_outlined), selectedIcon: Icon(Icons.search), label: '搜索'),
         NavigationDestination(icon: Icon(Icons.library_music_outlined), selectedIcon: Icon(Icons.library_music), label: '我的'),
       ],
       onDestinationSelected: (i) {
         switch (i) {
           case 0: context.go('/');
-          case 1: context.go('/library');
+          case 1: context.go('/search');
+          case 2: context.go('/library');
         }
       },
     );

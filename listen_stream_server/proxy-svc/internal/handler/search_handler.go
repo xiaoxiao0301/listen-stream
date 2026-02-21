@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SearchHandler serves /api/search/* endpoints.
@@ -14,11 +15,47 @@ func NewSearchHandler(base *ProxyHandler) *SearchHandler { return &SearchHandler
 
 func (h *SearchHandler) Register(rg *gin.RouterGroup) {
 	rg.GET("/hotkey", h.hotkey)
-	rg.GET("",        h.search)  // GET /api/search?keyword=...
+	rg.GET("/songs",   h.searchSongs)
+	rg.GET("/singers", h.searchSingers)
+	rg.GET("/albums",  h.searchAlbums)
+	rg.GET("/mvs",     h.searchMvs)
+	rg.GET("",         h.search)  // GET /api/search?keyword=...
 }
 
 func (h *SearchHandler) hotkey(c *gin.Context) {
 	h.handle(c, "/search/hotkey", pxcfg.ProxyTTL["/search/hotkey"])
+}
+
+func (h *SearchHandler) searchSongs(c *gin.Context) {
+	if c.Query("keyword") == "" && c.Query("q") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
+		return
+	}
+	h.handle(c, "/search/song", pxcfg.ProxyTTL["/search"])
+}
+
+func (h *SearchHandler) searchSingers(c *gin.Context) {
+	if c.Query("keyword") == "" && c.Query("q") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
+		return
+	}
+	h.handle(c, "/search/singer", pxcfg.ProxyTTL["/search"])
+}
+
+func (h *SearchHandler) searchAlbums(c *gin.Context) {
+	if c.Query("keyword") == "" && c.Query("q") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
+		return
+	}
+	h.handle(c, "/search/albums", pxcfg.ProxyTTL["/search"])
+}
+
+func (h *SearchHandler) searchMvs(c *gin.Context) {
+	if c.Query("keyword") == "" && c.Query("q") == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "keyword or q is required"})
+		return
+	}
+	h.handle(c, "/search/mv", pxcfg.ProxyTTL["/search"])
 }
 
 // search validates the required keyword param.

@@ -54,10 +54,16 @@ class ApiService {
       (await _dio.get<Map<String, dynamic>>('/api/album/songs', queryParameters: {'mid': mid})).data!;
 
   // ── Proxy: Search ───────────────────────────────────────────────────────────
-  Future<Map<String, dynamic>> searchSongs(String q, {int page = 1, int size = 20}) async =>
-      (await _dio.get<Map<String, dynamic>>('/api/search/songs', queryParameters: {'q': q, 'page': page, 'size': size})).data!;
   Future<Map<String, dynamic>> getSearchHotKeys() async =>
-      (await _dio.get<Map<String, dynamic>>('/api/search/hot-keys')).data!;
+      (await _dio.get<Map<String, dynamic>>('/api/search/hotkey')).data!;
+  Future<Map<String, dynamic>> searchSongs(String q, {int page = 1, int size = 20}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/search/songs', queryParameters: {'keyword': q, 'page': page, 'size': size})).data!;
+  Future<Map<String, dynamic>> searchSingers(String q, {int page = 1, int size = 20}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/search/singers', queryParameters: {'keyword': q, 'page': page, 'size': size})).data!;
+  Future<Map<String, dynamic>> searchAlbums(String q, {int page = 1, int size = 20}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/search/albums', queryParameters: {'keyword': q, 'page': page, 'size': size})).data!;
+  Future<Map<String, dynamic>> searchMvs(String q, {int page = 1, int size = 20}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/search/mvs', queryParameters: {'keyword': q, 'page': page, 'size': size})).data!;
 
   // ── Proxy: Song URL (no-cache) ──────────────────────────────────────────────
   Future<String> getSongUrl(String mid) async {

@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: infra infra-stop auth proxy sync admin dev dev-stop migrate
+.PHONY: infra infra-stop auth proxy sync admin dev dev-stop migrate clean-ports
 
 # ── Infrastructure ─────────────────────────────────────────────────────────────
 
@@ -15,22 +15,26 @@ infra:
 infra-stop:
 	docker compose -f docker-compose.dev.yml down
 
+## Clean up ports 8001-8004
+clean-ports:
+	@./scripts/kill-ports.sh
+
 # ── Individual service hot-reload targets ──────────────────────────────────────
 
 ## auth-svc  :8001  (JWT, SMS, login)
-auth:
+auth: clean-ports
 	air -c .air.auth-svc.toml
 
 ## proxy-svc :8002  (music API proxy + cache)
-proxy:
+proxy: clean-ports
 	air -c .air.proxy-svc.toml
 
 ## sync-svc  :8003  (WebSocket, favorites, history)
-sync:
+sync: clean-ports
 	air -c .air.sync-svc.toml
 
 ## admin-svc :8004  (admin panel backend)
-admin:
+admin: clean-ports
 	air -c .air.admin-svc.toml
 
 # ── Combined dev target ────────────────────────────────────────────────────────
@@ -38,7 +42,7 @@ admin:
 # Press Ctrl-C once to stop everything cleanly.
 
 ## Start everything (infra + all services with hot-reload)
-dev: infra
+dev: infra clean-ports
 	@mkdir -p tmp/logs
 	@echo "Starting all services with air hot-reload..."
 	@echo "  auth-svc  → :8001   (logs: tmp/logs/auth.log)"
@@ -52,6 +56,11 @@ dev: infra
 	air -c .air.sync-svc.toml  2>&1 | tee tmp/logs/sync.log  | sed 's/^/[sync]  /' & \
 	air -c .air.admin-svc.toml 2>&1 | tee tmp/logs/admin.log | sed 's/^/[admin] /' & \
 	wait
+
+## Stop all dev services and clean ports
+dev-stop: clean-ports
+	@pkill -f 'air -c' || true
+	@echo "Stopped dev services"
 
 # ── Database migrations ────────────────────────────────────────────────────────
 
