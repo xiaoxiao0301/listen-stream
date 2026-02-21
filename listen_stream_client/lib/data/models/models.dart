@@ -5,3 +5,5 @@ export 'song_item.dart';
 export 'album_item.dart';
 export 'playlist_detail.dart';
 export 'album_detail.dart';
+export 'singer_filter.dart';
+export 'mv_category.dart';

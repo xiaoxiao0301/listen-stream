@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/responsive/responsive.dart';
 import '../../data/models/models.dart';
 import '../../shared/widgets/app_error_widget.dart';
+import '../../shared/widgets/cover_image.dart';
 import '../../shared/widgets/song_list_tile.dart';
 import 'provider.dart';
 
 class AlbumDetailPage extends ConsumerWidget {
   const AlbumDetailPage({super.key, required this.albumMid});
-  
+
   final String albumMid;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = albumDetailProvider(albumMid);
-    
+
     return Scaffold(
       body: ref.watch(provider).when(
         data: (album) => _AlbumContent(album: album),
@@ -30,48 +32,70 @@ class AlbumDetailPage extends ConsumerWidget {
 
 class _AlbumContent extends StatelessWidget {
   const _AlbumContent({required this.album});
-  
+
   final AlbumDetail album;
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          expandedHeight: 300,
-          pinned: true,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Text(
-              album.albumName,
-              style: const TextStyle(fontSize: 16),
-            ),
-            background: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(
-                  album.coverUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(
-                    color: Color(0xFF1a1a2e),
-                  ),
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black54],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    return ResponsiveBuilderWithInfo(
+      builder: (context, deviceType, constraints) {
+        final isMobile = deviceType == DeviceType.mobile ||
+            deviceType == DeviceType.tablet;
+
+        return CustomScrollView(
+          slivers: [
+            _buildAppBar(context, isMobile),
+            _buildAlbumInfo(context, isMobile),
+            _buildSongList(context, isMobile),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context, bool isMobile) {
+    return SliverAppBar(
+      expandedHeight: isMobile ? 300 : 400,
+      pinned: true,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text(
+          album.albumName,
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 20,
           ),
         ),
-        
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            CoverImage(
+              imageUrl: album.coverUrl,
+              width: double.infinity,
+              height: double.infinity,
+              borderRadius: 0,
+            ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black54],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlbumInfo(BuildContext context, bool isMobile) {
+    return SliverToBoxAdapter(
+      child: ResponsivePadding(
+        mobile: const EdgeInsets.all(16),
+        desktop: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1280),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -103,7 +127,7 @@ class _AlbumContent extends StatelessWidget {
                   const SizedBox(height: 16),
                 ],
                 SizedBox(
-                  width: double.infinity,
+                  width: isMobile ? double.infinity : 200,
                   child: FilledButton.icon(
                     onPressed: () {
                       // TODO: 播放全部
@@ -116,24 +140,37 @@ class _AlbumContent extends StatelessWidget {
             ),
           ),
         ),
-        
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final song = album.songList[index];
-              return SongListTile(
-                index: index,
-                songMid: song.songMid,
-                songName: song.songName,
-                artistName: song.singerName ?? '',
-                albumMid: album.albumMid,
-                duration: song.interval,
-              );
-            },
-            childCount: album.songList.length,
-          ),
+      ),
+    );
+  }
+
+  Widget _buildSongList(BuildContext context, bool isMobile) {
+    return SliverPadding(
+      padding: isMobile
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(horizontal: 32),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final song = album.songList[index];
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1280),
+                child: SongListTile(
+                  index: index,
+                  songMid: song.songMid,
+                  songName: song.songName,
+                  artistName: song.singerName ?? '',
+                  albumMid: album.albumMid,
+                  duration: song.interval,
+                  showCover: !isMobile,
+                ),
+              ),
+            );
+          },
+          childCount: album.songList.length,
         ),
-      ],
+      ),
     );
   }
 }

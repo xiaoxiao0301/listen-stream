@@ -18,8 +18,12 @@ import 'features/ranking/list_page.dart';
 import 'features/ranking/detail_page.dart';
 import 'features/radio/list_page.dart';
 import 'features/radio/detail_page.dart';
+import 'features/singer_list/page.dart';
+import 'features/mv_list/page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
+import 'shared/widgets/tv/tv_components.dart';
+import 'core/responsive/responsive.dart';
 
 /// A [ChangeNotifier] that fires whenever the auth state changes,
 /// used as [GoRouter.refreshListenable] so the router re-evaluates
@@ -65,6 +69,8 @@ final _router = Provider<GoRouter>((ref) {
             path: '/radio/:radioId',
             builder: (_, state) => RadioDetailPage(radioId: state.pathParameters['radioId']!),
           ),
+          GoRoute(path: '/singer-list', builder: (_, __) => const SingerListPage()),
+          GoRoute(path: '/mv-list', builder: (_, __) => const MvListPage()),
           GoRoute(
             path: '/singer/:mid',
             builder: (_, state) => SingerDetailPage(mid: state.pathParameters['mid']!),
@@ -110,38 +116,85 @@ class ListenStreamApp extends ConsumerWidget {
   }
 }
 
-/// Bottom-nav shell (mobile/desktop). TV uses TvScaffold instead.
-class AppShell extends ConsumerWidget {
+/// Bottom-nav shell (mobile/desktop). TV uses side navigation.
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key, required this.child});
   final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (PlatformUtil.isTV) {
-      return child; // TV scaffold injected at TvScaffold level
-    }
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: _BottomNav(),
-    );
-  }
+  ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _BottomNav extends StatelessWidget {
+class _AppShellState extends ConsumerState<AppShell> {
+  int _selectedIndex = 0;
+
+  void _onDestinationSelected(int index) {
+    setState(() => _selectedIndex = index);
+    switch (index) {
+      case 0:
+        context.go('/');
+      case 1:
+        context.go('/search');
+      case 2:
+        context.go('/library');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return NavigationBar(
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: '首页'),
-        NavigationDestination(icon: Icon(Icons.search_outlined), selectedIcon: Icon(Icons.search), label: '搜索'),
-        NavigationDestination(icon: Icon(Icons.library_music_outlined), selectedIcon: Icon(Icons.library_music), label: '我的'),
-      ],
-      onDestinationSelected: (i) {
-        switch (i) {
-          case 0: context.go('/');
-          case 1: context.go('/search');
-          case 2: context.go('/library');
+    return ResponsiveBuilderWithInfo(
+      builder: (context, deviceType, constraints) {
+        // TV端使用侧边栏导航
+        if (deviceType == DeviceType.tv || PlatformUtil.isTV) {
+          return TvLayout(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onDestinationSelected,
+            destinations: const [
+              TvNavigationDestination(
+                icon: Icons.home_outlined,
+                selectedIcon: Icons.home,
+                label: '首页',
+              ),
+              TvNavigationDestination(
+                icon: Icons.search_outlined,
+                selectedIcon: Icons.search,
+                label: '搜索',
+              ),
+              TvNavigationDestination(
+                icon: Icons.library_music_outlined,
+                selectedIcon: Icons.library_music,
+                label: '我的音乐',
+              ),
+            ],
+            child: widget.child,
+          );
         }
+
+        // 移动端和桌面端使用底部导航
+        return Scaffold(
+          body: widget.child,
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onDestinationSelected,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: '首页',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.search_outlined),
+                selectedIcon: Icon(Icons.search),
+                label: '搜索',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.library_music_outlined),
+                selectedIcon: Icon(Icons.library_music),
+                label: '我的',
+              ),
+            ],
+          ),
+        );
       },
     );
   }
