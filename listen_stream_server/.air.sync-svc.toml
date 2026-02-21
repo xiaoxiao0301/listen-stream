@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   cmd = "go build -mod=vendor -o ./tmp/sync-svc ./sync-svc/cmd/server/"
   bin = "./tmp/sync-svc"
-  full_bin = "PORT=8003 ./tmp/sync-svc"
+  full_bin = "source .env && PORT=8003 ./tmp/sync-svc"
   include_dir = ["sync-svc", "shared"]
   exclude_dir = ["tmp", "vendor", "testdata", "listen_stream_admin", "listen_stream_client"]
   include_ext = ["go"]
