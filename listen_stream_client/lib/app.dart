@@ -15,6 +15,8 @@ import 'features/album/page.dart';
 import 'features/search/page.dart';
 import 'features/ranking/list_page.dart';
 import 'features/ranking/detail_page.dart';
+import 'features/radio/list_page.dart';
+import 'features/radio/detail_page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
 
@@ -56,6 +58,11 @@ final _router = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/ranking/:topId',
             builder: (_, state) => RankingDetailPage(topId: state.pathParameters['topId']!),
+          ),
+          GoRoute(path: '/radio', builder: (_, __) => const RadioListPage()),
+          GoRoute(
+            path: '/radio/:radioId',
+            builder: (_, state) => RadioDetailPage(radioId: state.pathParameters['radioId']!),
           ),
           GoRoute(
             path: '/singer/:mid',

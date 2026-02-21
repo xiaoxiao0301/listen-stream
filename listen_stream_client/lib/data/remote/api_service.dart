@@ -83,6 +83,24 @@ class ApiService {
   Future<Map<String, dynamic>> getRankingDetail(String id, {int page = 1}) async =>
       (await _dio.get<Map<String, dynamic>>('/api/ranking/detail', queryParameters: {'id': id, 'page': page})).data!;
 
+  // ── Proxy: Radio ────────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getRadioList() async =>
+      (await _dio.get<Map<String, dynamic>>('/api/radio/list')).data!;
+  Future<Map<String, dynamic>> getRadioSongs(String radioId) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/radio/songs', queryParameters: {'id': radioId})).data!;
+
+  // ── Proxy: MV ───────────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getMVCategories() async =>
+      (await _dio.get<Map<String, dynamic>>('/api/mv/categories')).data!;
+  Future<Map<String, dynamic>> getMVList({String? areaId, String? typeId, int page = 1}) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/mv/list', queryParameters: {
+        if (areaId != null) 'area': areaId,
+        if (typeId != null) 'type': typeId,
+        'page': page,
+      })).data!;
+  Future<Map<String, dynamic>> getMVDetail(String vid) async =>
+      (await _dio.get<Map<String, dynamic>>('/api/mv/detail', queryParameters: {'vid': vid})).data!;
+
   // ── Sync: User data ─────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> getUserSync({DateTime? since}) async {
     final params = since != null ? {'since': since.toIso8601String()} : null;
