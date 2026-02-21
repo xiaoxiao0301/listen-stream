@@ -13,6 +13,8 @@ import 'features/singer/page.dart';
 import 'features/playlist/page.dart';
 import 'features/album/page.dart';
 import 'features/search/page.dart';
+import 'features/ranking/list_page.dart';
+import 'features/ranking/detail_page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
 
@@ -50,6 +52,11 @@ final _router = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const HomePage()),
           GoRoute(path: '/search', builder: (_, __) => const SearchPage()),
+          GoRoute(path: '/ranking', builder: (_, __) => const RankingListPage()),
+          GoRoute(
+            path: '/ranking/:topId',
+            builder: (_, state) => RankingDetailPage(topId: state.pathParameters['topId']!),
+          ),
           GoRoute(
             path: '/singer/:mid',
             builder: (_, state) => SingerDetailPage(mid: state.pathParameters['mid']!),
