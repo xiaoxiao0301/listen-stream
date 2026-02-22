@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/loading_shimmer.dart';
 import '../../../shared/widgets/app_error_widget.dart';
+import '../../../shared/widgets/media_card.dart';
+import '../../../shared/widgets/responsive_grid_view.dart';
+import '../../../shared/widgets/section_header.dart';
 import '../../../data/models/models.dart';
-import '../../../core/responsive/responsive.dart';
+import '../../../core/responsive/responsive.dart' hide ResponsiveGridView;
 import '../provider.dart';
 import '../widgets/banner_section.dart';
 import '../widgets/nav_item.dart';
-import '../widgets/card_item.dart';
 
 /// 首页桌面端布局 - 多列网格布局
 class HomeDesktopLayout extends ConsumerWidget {
@@ -17,6 +19,8 @@ class HomeDesktopLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final gridSpacing = ResponsiveSpacing.gridSpacing(context);
+
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(bannerProvider);
@@ -29,9 +33,8 @@ class HomeDesktopLayout extends ConsumerWidget {
         maxWidthTv: 1600,
         padding: ResponsiveSpacing.horizontalPadding(context),
         child: ListView(
+          padding: const EdgeInsets.only(top: 24, bottom: 32),
           children: [
-            const SizedBox(height: 24),
-
             // ── Banner + Quick Navigation (Side by Side) ─────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,16 +64,37 @@ class HomeDesktopLayout extends ConsumerWidget {
             const SizedBox(height: 32),
 
             // ── Recommend Playlist (Grid) ─────────────────────────────────
+            const SectionHeader(
+              title: '推荐歌单',
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 16),
             ref.watch(recommendPlaylistProvider).when(
-              data: (items) => _PlaylistGridSection(
-                title: '推荐歌单',
-                items: items,
+              data: (items) => ResponsiveGridView(
+                itemCount: items.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                childAspectRatio: 0.78,
+                mobileColumns: 2,
+                tabletColumns: 3,
+                desktopColumns: ResponsiveGrid.playlistColumns(context),
+                tvColumns: 6,
+                itemBuilder: (_, index) {
+                  final item = items[index];
+                  return PlaylistCard(
+                    imageUrl: item.coverUrl,
+                    title: item.title,
+                    creator: item.creatorNick,
+                    onTap: () => context.push('/playlist/${item.id}'),
+                  );
+                },
               ),
               loading: () => const LoadingShimmer(height: 280),
               error: (e, _) => const SizedBox.shrink(),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // ── New Songs + New Albums (Side by Side) ─────────────────────
             Row(
@@ -88,7 +112,7 @@ class HomeDesktopLayout extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(width: 24),
+                SizedBox(width: gridSpacing),
 
                 // New Albums (右侧)
                 Expanded(
@@ -103,8 +127,6 @@ class HomeDesktopLayout extends ConsumerWidget {
                 ),
               ],
             ),
-
-            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -115,6 +137,13 @@ class HomeDesktopLayout extends ConsumerWidget {
 // ── Quick Navigation Grid ───────────────────────────────────────────────────
 Widget _QuickNavGrid(BuildContext context) {
   return Card(
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: BorderSide(
+        color: Theme.of(context).colorScheme.outlineVariant,
+      ),
+    ),
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -161,62 +190,6 @@ Widget _QuickNavGrid(BuildContext context) {
   );
 }
 
-// ── Playlist Grid Section ───────────────────────────────────────────────────
-class _PlaylistGridSection extends StatelessWidget {
-  const _PlaylistGridSection({required this.title, required this.items});
-  final String title;
-  final List<PlaylistItem> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final columns = ResponsiveGrid.playlistColumns(context);
-    final displayItems = items.take(columns * 2).toList(); // 显示2行
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              TextButton(
-                onPressed: () {
-                  // TODO: 跳转到更多页面
-                },
-                child: const Text('更多'),
-              ),
-            ],
-          ),
-        ),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: ResponsiveSpacing.gridSpacing(context),
-            mainAxisSpacing: ResponsiveSpacing.gridSpacing(context),
-            childAspectRatio: 0.8,
-          ),
-          itemCount: displayItems.length,
-          itemBuilder: (_, i) {
-            final item = displayItems[i];
-            return CardItem(
-              coverUrl: item.coverUrl,
-              title: item.title,
-              subtitle: item.creatorNick,
-              width: double.infinity,
-              imageSize: double.infinity,
-              onTap: () => context.push('/playlist/${item.id}'),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
 // ── Song Grid Section ───────────────────────────────────────────────────────
 class _SongGridSection extends StatelessWidget {
   const _SongGridSection({required this.title, required this.items});
@@ -228,11 +201,19 @@ class _SongGridSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        SectionHeader(
+          title: title,
+          padding: EdgeInsets.zero,
         ),
+        const SizedBox(height: 12),
         Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -241,6 +222,8 @@ class _SongGridSection extends StatelessWidget {
             itemBuilder: (_, i) {
               final item = items[i];
               return ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: Image.network(
@@ -282,11 +265,19 @@ class _AlbumGridSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        SectionHeader(
+          title: title,
+          padding: EdgeInsets.zero,
         ),
+        const SizedBox(height: 12),
         Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -295,6 +286,8 @@ class _AlbumGridSection extends StatelessWidget {
             itemBuilder: (_, i) {
               final item = items[i];
               return ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: Image.network(

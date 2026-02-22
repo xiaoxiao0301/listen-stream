@@ -33,8 +33,8 @@ func (h *RecommendHandler) playlist(c *gin.Context) {
 	h.handle(c, "/recommend/playlist", pxcfg.ProxyTTL["/recommend/playlist"])
 }
 func (h *RecommendHandler) newSongs(c *gin.Context) {
-	h.handle(c, "/recommend/new/songs", pxcfg.ProxyTTL["/recommend/new/songs"])
+	h.handle(c, "/recommend/new/songs", pxcfg.ProxyTTL["/recommend/new-songs"])
 }
 func (h *RecommendHandler) newAlbums(c *gin.Context) {
-	h.handle(c, "/recommend/new/albums", pxcfg.ProxyTTL["/recommend/new/albums"])
+	h.handle(c, "/recommend/new/albums", pxcfg.ProxyTTL["/recommend/new-albums"])
 }

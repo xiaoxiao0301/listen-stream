@@ -6,18 +6,20 @@ class TvSideNavigation extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
   final List<TvNavigationDestination> destinations;
+  final double width;
 
   const TvSideNavigation({
     super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
     required this.destinations,
+    this.width = 280,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 280,
+      width: width,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Column(
         children: [
@@ -33,11 +35,16 @@ class TvSideNavigation extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Listen Stream',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                // Prevent overflow by allowing the title to flex and ellipsize
+                Expanded(
+                  child: Text(
+                    'Listen Stream',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -63,6 +70,8 @@ class TvSideNavigation extends StatelessWidget {
                     child: InkWell(
                       onTap: () => onDestinationSelected(index),
                       borderRadius: BorderRadius.circular(12),
+                      hoverColor:
+                          Theme.of(context).colorScheme.primary.withOpacity(0.08),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -82,17 +91,22 @@ class TvSideNavigation extends StatelessWidget {
                               size: 28,
                             ),
                             const SizedBox(width: 16),
-                            Text(
-                              destination.label,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight:
-                                    isSelected ? FontWeight.w600 : FontWeight.normal,
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                            // Allow label to flex so long labels don't overflow the row
+                            Expanded(
+                              child: Text(
+                                destination.label,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight:
+                                      isSelected ? FontWeight.w600 : FontWeight.normal,
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],

@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // RankingHandler serves /api/rankings/* endpoints.
@@ -19,5 +20,5 @@ func (h *RankingHandler) list(c *gin.Context) {
 	h.handle(c, "/rankings/list", pxcfg.ProxyTTL["/rankings/list"])
 }
 func (h *RankingHandler) detail(c *gin.Context) {
-	h.handle(c, "/rankings/detail", pxcfg.ProxyTTL["/rankings/detail"])
+	h.handleWithParamMap(c, "/rankings/detail", pxcfg.ProxyTTL["/rankings/detail"], map[string]string{"id": "id"})
 }

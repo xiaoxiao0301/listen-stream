@@ -13,7 +13,16 @@ final albumDetailProvider = StreamProvider.family<AlbumDetail, String>((ref, mid
   return policy.fetch(
     cacheKey: 'album:detail:$mid',
     ttlSeconds: TtlConstants.albumDetail,
-    networkFetch: () => api.getAlbumDetail(mid),
+    networkFetch: () async {
+      final detail = await api.getAlbumDetail(mid);
+      // fetch songs separately and merge into detail.data.songList
+      final songs = await api.getAlbumSongs(mid);
+      final merged = Map<String, dynamic>.from(detail);
+      final data = Map<String, dynamic>.from(merged['data'] as Map<String, dynamic>);
+      data['songList'] = (songs['data'] as Map<String, dynamic>)['list'] ?? [];
+      merged['data'] = data;
+      return merged;
+    },
     fromJson: (j) => j,
   ).map((r) {
     final data = r.data;

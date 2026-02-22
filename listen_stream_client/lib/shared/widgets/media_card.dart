@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'cover_image.dart';
 
 /// 媒体卡片组件 - 统一的卡片样式（专辑、歌单、歌手等）
-class MediaCard extends StatelessWidget {
+class MediaCard extends StatefulWidget {
   const MediaCard({
     super.key,
     required this.imageUrl,
@@ -27,95 +27,142 @@ class MediaCard extends StatelessWidget {
   final BoxShape imageShape;
 
   @override
+  State<MediaCard> createState() => _MediaCardState();
+}
+
+class _MediaCardState extends State<MediaCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 封面图片
-          AspectRatio(
-            aspectRatio: aspectRatio,
-            child: Stack(
+    final theme = Theme.of(context);
+    final borderRadius = BorderRadius.circular(widget.borderRadius);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: borderRadius,
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withOpacity(0.12),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withOpacity(0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
+            borderRadius: borderRadius,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                CoverImage(
-                  imageUrl: imageUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  borderRadius: borderRadius,
-                  shape: imageShape,
-                ),
-                // 播放次数角标
-                if (playCount != null)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                // 封面图片
+                AspectRatio(
+                  aspectRatio: widget.aspectRatio,
+                  child: Stack(
+                    children: [
+                      CoverImage(
+                        imageUrl: widget.imageUrl,
+                        width: double.infinity,
+                        height: double.infinity,
+                        borderRadius: widget.borderRadius,
+                        shape: widget.imageShape,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.play_arrow,
-                            size: 12,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            _formatCount(playCount!),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
+                      // 播放次数角标
+                      if (widget.playCount != null)
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.play_arrow,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  _formatCount(widget.playCount!),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
+                      // 自定义角标
+                      if (widget.badge != null)
+                        Positioned(
+                          top: 4,
+                          left: 4,
+                          child: widget.badge!,
+                        ),
+                    ],
+                  ),
+                ),
+                // Text area with fixed padding
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 标题
+                      Text(
+                        widget.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                      // 副标题
+                      if (widget.subtitle != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                // 自定义角标
-                if (badge != null)
-                  Positioned(
-                    top: 4,
-                    left: 4,
-                    child: badge!,
-                  ),
+                ),
               ],
             ),
           ),
-
-          const SizedBox(height: 8),
-
-          // 标题
-          Text(
-            title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-
-          // 副标题
-          if (subtitle != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              subtitle!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }

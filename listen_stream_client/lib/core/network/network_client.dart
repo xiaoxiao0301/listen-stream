@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth_interceptor.dart';
@@ -32,7 +33,7 @@ class NetworkClient {
 
     dio.interceptors.addAll([
       AuthInterceptor(dio: dio, ref: ref),
-      ETagInterceptor(),
+      if (!kDebugMode) ETagInterceptor(),
       RetryInterceptor(dio: dio),
       if (const bool.fromEnvironment('dart.vm.product', defaultValue: false) == false)
         LogInterceptor(requestBody: true, responseBody: true),

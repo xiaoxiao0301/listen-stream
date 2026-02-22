@@ -12,7 +12,7 @@ final singerDetailFamily = StreamProvider.family<Map<String, dynamic>, String>((
     ttlSeconds: TtlConstants.singerDetail,
     networkFetch: () => api.getSingerDetail(mid),
     fromJson: (j) => j,
-  ).map((r) => r.data);
+  ).map((r) => (r.data['data'] as Map<String, dynamic>?) ?? {});
 });
 
 final singerSongsFamily = StreamProvider.family<Map<String, dynamic>, String>((ref, mid) {
@@ -23,7 +23,7 @@ final singerSongsFamily = StreamProvider.family<Map<String, dynamic>, String>((r
     ttlSeconds: TtlConstants.singerSongs,
     networkFetch: () => api.getSingerSongs(mid),
     fromJson: (j) => j,
-  ).map((r) => r.data);
+  ).map((r) => (r.data['data'] as Map<String, dynamic>?) ?? {});
 });
 
 final singerAlbumsFamily = StreamProvider.family<Map<String, dynamic>, String>((ref, mid) {
@@ -34,5 +34,16 @@ final singerAlbumsFamily = StreamProvider.family<Map<String, dynamic>, String>((
     ttlSeconds: TtlConstants.singerAlbums,
     networkFetch: () => api.getSingerAlbums(mid),
     fromJson: (j) => j,
-  ).map((r) => r.data);
+  ).map((r) => (r.data['data'] as Map<String, dynamic>?) ?? {});
+});
+
+final singerMvsFamily = StreamProvider.family<Map<String, dynamic>, String>((ref, mid) {
+  final policy = ref.read(cachePolicyProvider);
+  final api = ref.read(apiServiceProvider);
+  return policy.fetch(
+    cacheKey: 'singer:mvs:$mid',
+    ttlSeconds: TtlConstants.singerMvs,
+    networkFetch: () => api.getSingerMvs(mid),
+    fromJson: (j) => j,
+  ).map((r) => (r.data['data'] as Map<String, dynamic>?) ?? {});
 });

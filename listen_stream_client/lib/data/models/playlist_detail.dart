@@ -61,9 +61,9 @@ class SongDetail {
     final albumMid = album?['mid'] as String? ?? json['albummid'] as String?;
 
     return SongDetail(
-      id: json['id'] as int? ?? 0,
-      mid: json['mid'] as String? ?? '',
-      name: json['name'] as String? ?? json['title'] as String? ?? '',
+      id: json['songid'] as int? ?? json['id'] as int? ?? 0,
+      mid: json['songmid'] as String? ?? json['mid'] as String? ?? '',
+      name: json['songname'] as String? ?? json['name'] as String? ?? json['title'] as String? ?? '',
       singerName: singerName,
       albumName: albumName,
       albumMid: albumMid,

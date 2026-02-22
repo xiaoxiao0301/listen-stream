@@ -11,7 +11,8 @@ import '../../../data/models/models.dart';
 import '../provider.dart';
 import '../widgets/banner_section.dart';
 import '../widgets/nav_item.dart';
-import '../widgets/card_item.dart';
+import '../../../shared/widgets/media_card.dart';
+import '../../../shared/widgets/section_header.dart';
 
 /// 首页移动端布局 - 垂直滚动单列布局
 class HomeMobileLayout extends ConsumerStatefulWidget {
@@ -35,6 +36,7 @@ class _HomeMobileLayoutState extends ConsumerState<HomeMobileLayout> {
         ref.invalidate(recommendNewAlbumsProvider);
       },
       child: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
           // ── Banner ──────────────────────────────────────────────────────
           ref.watch(bannerProvider).when(
@@ -136,27 +138,32 @@ class _PlaylistSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        SectionHeader(
+          title: title,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         SizedBox(
-          height: 140,
-          child: ListView.builder(
+          height: 200,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemCount: items.length,
             itemBuilder: (_, i) {
               final item = items[i];
-              return CardItem(
-                coverUrl: item.coverUrl,
-                title: item.title,
-                subtitle: item.creatorNick,
-                onTap: () => context.push('/playlist/${item.id}'),
+              return SizedBox(
+                width: 140,
+                child: PlaylistCard(
+                  imageUrl: item.coverUrl,
+                  title: item.title,
+                  creator: item.creatorNick,
+                  onTap: () => context.push('/playlist/${item.id}'),
+                ),
               );
             },
           ),
         ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -173,27 +180,32 @@ class _SongSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        SectionHeader(
+          title: title,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         SizedBox(
-          height: 140,
-          child: ListView.builder(
+          height: 200,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemCount: items.length,
             itemBuilder: (_, i) {
               final item = items[i];
-              return CardItem(
-                coverUrl: item.coverUrl,
-                title: item.name,
-                subtitle: item.displayArtist,
-                onTap: () => context.push('/song/${item.mid}'),
+              return SizedBox(
+                width: 140,
+                child: MediaCard(
+                  imageUrl: item.coverUrl,
+                  title: item.name,
+                  subtitle: item.displayArtist,
+                  onTap: () => context.push('/song/${item.mid}'),
+                ),
               );
             },
           ),
         ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -210,27 +222,32 @@ class _AlbumSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        SectionHeader(
+          title: title,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         SizedBox(
-          height: 140,
-          child: ListView.builder(
+          height: 200,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemCount: items.length,
             itemBuilder: (_, i) {
               final item = items[i];
-              return CardItem(
-                coverUrl: item.coverUrl,
-                title: item.name,
-                subtitle: item.displayArtist,
-                onTap: () => context.push('/album/${item.mid}'),
+              return SizedBox(
+                width: 140,
+                child: AlbumCard(
+                  imageUrl: item.coverUrl,
+                  title: item.name,
+                  artist: item.displayArtist,
+                  onTap: () => context.push('/album/${item.mid}'),
+                ),
               );
             },
           ),
         ),
+        const SizedBox(height: 8),
       ],
     );
   }

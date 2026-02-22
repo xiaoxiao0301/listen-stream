@@ -89,6 +89,8 @@ func main() {
 		handler.NewAlbumHandler(proxyHandler).Register(api.Group("/album"))
 		handler.NewSearchHandler(proxyHandler).Register(api.Group("/search"))
 		handler.NewLyricHandler(proxyHandler).Register(api.Group("/lyric"))
+		// Song endpoints (e.g., /api/song/detail?id=...)
+		handler.NewSongHandler(proxyHandler).Register(api.Group("/song"))
 	}
 
 	// ── 8. Serve ───────────────────────────────────────────────────────────────

@@ -20,9 +20,12 @@ import 'features/radio/list_page.dart';
 import 'features/radio/detail_page.dart';
 import 'features/singer_list/page.dart';
 import 'features/mv_list/page.dart';
+import 'features/mv/page.dart';
 import 'shared/platform/platform_util.dart';
 import 'shared/theme.dart';
 import 'shared/widgets/tv/tv_components.dart';
+import 'shared/widgets/left_nav.dart';
+import 'shared/widgets/player_bar.dart';
 import 'core/responsive/responsive.dart';
 
 /// A [ChangeNotifier] that fires whenever the auth state changes,
@@ -87,6 +90,10 @@ final _router = Provider<GoRouter>((ref) {
             path: '/song/:mid',
             builder: (_, state) => SongDetailPage(songMid: state.pathParameters['mid']!),
           ),
+          GoRoute(
+            path: '/mv/:vid',
+            builder: (_, state) => MvDetailPage(vid: state.pathParameters['vid']!),
+          ),
           GoRoute(path: '/library', builder: (_, __) => const LibraryPage()),
           GoRoute(path: '/player', builder: (_, __) => const PlayerPage()),
         ],
@@ -144,33 +151,57 @@ class _AppShellState extends ConsumerState<AppShell> {
   Widget build(BuildContext context) {
     return ResponsiveBuilderWithInfo(
       builder: (context, deviceType, constraints) {
-        // TV端使用侧边栏导航
+        // TV端使用侧边栏导航（LeftNav）
         if (deviceType == DeviceType.tv || PlatformUtil.isTV) {
-          return TvLayout(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onDestinationSelected,
-            destinations: const [
-              TvNavigationDestination(
-                icon: Icons.home_outlined,
-                selectedIcon: Icons.home,
-                label: '首页',
+          return Row(
+            children: [
+              LeftNav(
+                width: 240,
+                activeIndex: _selectedIndex,
+                items: [
+                  NavItem(icon: Icons.home_outlined, label: '首页', onTap: () => context.go('/')),
+                  NavItem(icon: Icons.search_outlined, label: '搜索', onTap: () => context.go('/search')),
+                  NavItem(icon: Icons.library_music_outlined, label: '我的音乐', onTap: () => context.go('/library')),
+                ],
               ),
-              TvNavigationDestination(
-                icon: Icons.search_outlined,
-                selectedIcon: Icons.search,
-                label: '搜索',
-              ),
-              TvNavigationDestination(
-                icon: Icons.library_music_outlined,
-                selectedIcon: Icons.library_music,
-                label: '我的音乐',
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(child: widget.child),
+                    const PlayerBar(),
+                  ],
+                ),
               ),
             ],
-            child: widget.child,
           );
         }
 
-        // 移动端和桌面端使用底部导航
+        // 桌面端使用侧边栏导航
+        if (deviceType == DeviceType.desktop) {
+          return Row(
+            children: [
+              LeftNav(
+                width: 240,
+                activeIndex: _selectedIndex,
+                items: [
+                  NavItem(icon: Icons.home_outlined, label: '首页', onTap: () => context.go('/')),
+                  NavItem(icon: Icons.search_outlined, label: '搜索', onTap: () => context.go('/search')),
+                  NavItem(icon: Icons.library_music_outlined, label: '我的音乐', onTap: () => context.go('/library')),
+                ],
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(child: widget.child),
+                    const PlayerBar(),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
+        // 移动端使用底部导航
         return Scaffold(
           body: widget.child,
           bottomNavigationBar: NavigationBar(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/cover_image.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/section_header.dart';
 import '../../../data/models/search_result.dart';
 import '../provider.dart';
 
@@ -117,23 +118,35 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const Text(
-              '热门搜索',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const SectionHeader(
+              title: '热门搜索',
+              padding: EdgeInsets.zero,
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: hotKeys.map((hotKey) {
-                return ActionChip(
-                  label: Text(hotKey.keyword),
-                  onPressed: () {
-                    _searchController.text = hotKey.keyword;
-                    _performSearch();
-                  },
-                );
-              }).toList(),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: hotKeys.map((hotKey) {
+                    return ActionChip(
+                      label: Text(hotKey.keyword),
+                      onPressed: () {
+                        _searchController.text = hotKey.keyword;
+                        _performSearch();
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ],
         );
@@ -156,31 +169,46 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
         if (songs.isEmpty) {
           return EmptySearchResult(keyword: keyword);
         }
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
           itemCount: songs.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final song = songs[index];
-            return ListTile(
-              leading: CoverImage(
-                imageUrl: song.coverUrl,
-                width: 48,
-                height: 48,
-                borderRadius: 4,
+            return Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
-              title: Text(
-                song.songName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                leading: CoverImage(
+                  imageUrl: song.coverUrl,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 6,
+                ),
+                title: Text(
+                  song.songName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  '${song.singerName} · ${song.albumName}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Text(song.durationText),
+                onTap: () {
+                  // TODO: Play song
+                },
               ),
-              subtitle: Text(
-                '${song.singerName} · ${song.albumName}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Text(song.durationText),
-              onTap: () {
-                // TODO: Play song
-              },
             );
           },
         );
@@ -203,24 +231,40 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
         if (singers.isEmpty) {
           return EmptySearchResult(keyword: keyword);
         }
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
           itemCount: singers.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final singer = singers[index];
-            return ListTile(
-              leading: AvatarImage(
-                imageUrl: singer.avatarUrl,
-                size: 48,
+            return Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
-              title: Text(
-                singer.singerName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                leading: AvatarImage(
+                  imageUrl: singer.avatarUrl,
+                  size: 48,
+                ),
+                title: Text(
+                  singer.singerName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle:
+                    Text('${singer.songCount} 首歌曲 · ${singer.albumCount} 张专辑'),
+                onTap: () {
+                  context.push('/singer/${singer.singerMid}');
+                },
               ),
-              subtitle: Text('${singer.songCount} 首歌曲 · ${singer.albumCount} 张专辑'),
-              onTap: () {
-                context.push('/singer/${singer.singerMid}');
-              },
             );
           },
         );
@@ -243,32 +287,47 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
         if (albums.isEmpty) {
           return EmptySearchResult(keyword: keyword);
         }
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
           itemCount: albums.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final album = albums[index];
-            return ListTile(
-              leading: CoverImage(
-                imageUrl: album.coverUrl,
-                width: 48,
-                height: 48,
-                borderRadius: 4,
+            return Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
-              title: Text(
-                album.albumName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                leading: CoverImage(
+                  imageUrl: album.coverUrl,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 6,
+                ),
+                title: Text(
+                  album.albumName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  album.singerName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing:
+                    album.publishTime != null ? Text(album.publishTime!) : null,
+                onTap: () {
+                  context.push('/album/${album.albumMid}');
+                },
               ),
-              subtitle: Text(
-                album.singerName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing:
-                  album.publishTime != null ? Text(album.publishTime!) : null,
-              onTap: () {
-                context.push('/album/${album.albumMid}');
-              },
             );
           },
         );
@@ -290,31 +349,46 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
         if (mvs.isEmpty) {
           return EmptySearchResult(keyword: keyword);
         }
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
           itemCount: mvs.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final mv = mvs[index];
-            return ListTile(
-              leading: CoverImage(
-                imageUrl: mv.coverUrl,
-                width: 72,
-                height: 48,
-                borderRadius: 4,
+            return Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
-              title: Text(
-                mv.mvName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                leading: CoverImage(
+                  imageUrl: mv.coverUrl,
+                  width: 72,
+                  height: 48,
+                  borderRadius: 6,
+                ),
+                title: Text(
+                  mv.mvName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  mv.singerName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Text(mv.durationText),
+                onTap: () {
+                  // TODO: Play MV
+                },
               ),
-              subtitle: Text(
-                mv.singerName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Text(mv.durationText),
-              onTap: () {
-                // TODO: Play MV
-              },
             );
           },
         );

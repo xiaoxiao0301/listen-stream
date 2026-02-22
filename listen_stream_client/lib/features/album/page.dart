@@ -43,6 +43,7 @@ class _AlbumContent extends StatelessWidget {
             deviceType == DeviceType.tablet;
 
         return CustomScrollView(
+          primary: true,
           slivers: [
             _buildAppBar(context, isMobile),
             _buildAlbumInfo(context, isMobile),

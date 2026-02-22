@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/responsive/responsive.dart';
 import '../../shared/widgets/cover_image.dart';
@@ -140,11 +141,13 @@ class _MvListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mvListAsync = ref.watch(
-      mvListProvider({
-        'areaId': area.toString(),
-        'typeId': version.toString(),
-        'page': 1,
-      }),
+      mvListProvider(
+        MvListParams(
+          areaId: area.toString(),
+          typeId: version.toString(),
+          page: 1,
+        ),
+      ),
     );
 
     return mvListAsync.when(
@@ -191,10 +194,9 @@ class _MvListView extends ConsumerWidget {
 
                   return InkWell(
                     onTap: () {
-                      // TODO: 跳转到MV详情页
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('播放 MV: $title')),
-                      );
+                      if (vid.isNotEmpty) {
+                        context.push('/mv/$vid');
+                      }
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Column(
@@ -298,11 +300,13 @@ class _MvListView extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => NetworkErrorState(
-        onRetry: () => ref.invalidate(mvListProvider({
-              'areaId': area.toString(),
-              'typeId': version.toString(),
-              'page': 1,
-            })),
+        onRetry: () => ref.invalidate(mvListProvider(
+          MvListParams(
+            areaId: area.toString(),
+            typeId: version.toString(),
+            page: 1,
+          ),
+        )),
       ),
     );
   }

@@ -84,6 +84,9 @@ class PlaybackService {
     );
   }
 
+  /// Public future that completes when the internal audio handler is ready.
+  Future<void> get ready => _ready;
+
   PlayQueue _queue = const PlayQueue(songs: [], currentIndex: 0);
   PlayMode _mode = PlayMode.sequence;
 

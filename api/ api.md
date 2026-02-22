@@ -284,6 +284,21 @@ reponse file: ./album_songs.json
 
 > id 是 专辑 mid 
 
+# Song Module
+
+歌曲
+
+## Song Detail
+
+歌曲详情
+
+```
+url: "/song/detail?id=003FYnmA2KmMXg"
+method: GET
+reponse file: ./song_detail.json
+```
+
+
 # Search Module
 
 搜索模块

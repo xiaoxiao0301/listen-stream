@@ -159,20 +159,23 @@ class _SingerListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final singerListAsync = ref.watch(
-      singerListProvider({
-        'area': area,
-        'genre': genre,
-        'index': index,
-        'sex': sex,
-        'page': 1,
-        'size': 80,
-      }),
+      singerListProvider(
+        SingerListParams(
+          area: area,
+          genre: genre,
+          index: index,
+          sex: sex,
+          page: 1,
+          size: 80,
+        ),
+      ),
     );
 
     return singerListAsync.when(
       data: (response) {
         final data = response['data'] as Map<String, dynamic>;
-        final singers = (data['singerList'] as List).cast<Map<String, dynamic>>();
+        final rawSingers = data['singerList'] ?? data['singerlist'] ?? <dynamic>[];
+        final singers = (rawSingers as List).cast<Map<String, dynamic>>();
 
         if (singers.isEmpty) {
           return const EmptyState(
@@ -257,14 +260,14 @@ class _SingerListView extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => NetworkErrorState(
-        onRetry: () => ref.invalidate(singerListProvider({
-              'area': area,
-              'genre': genre,
-              'index': index,
-              'sex': sex,
-              'page': 1,
-              'size': 80,
-            })),
+        onRetry: () => ref.invalidate(singerListProvider(SingerListParams(
+              area: area,
+              genre: genre,
+              index: index,
+              sex: sex,
+              page: 1,
+              size: 80,
+            ))),
       ),
     );
   }

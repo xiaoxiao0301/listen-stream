@@ -31,5 +31,6 @@ var ProxyTTL = map[string]time.Duration{
 	"/album/songs":          12 * time.Hour,
 	"/search/hotkey":        15 * time.Minute,
 	"/search":               5 * time.Minute,
+	"/song/detail":         12 * time.Hour,
 	"/lyric":                7 * 24 * time.Hour,
 }

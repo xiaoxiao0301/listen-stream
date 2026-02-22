@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pxcfg "listen-stream/proxy-svc/internal/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 // LyricHandler serves /api/lyric endpoint.
@@ -23,5 +24,5 @@ func (h *LyricHandler) lyric(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": "MISSING_PARAM", "message": "id is required"})
 		return
 	}
-	h.handle(c, "/lyric", pxcfg.ProxyTTL["/lyric"])
+	h.handle(c, "/lyric/", pxcfg.ProxyTTL["/lyric"])
 }
