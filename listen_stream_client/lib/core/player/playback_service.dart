@@ -7,6 +7,15 @@ import 'package:just_audio/just_audio.dart';
 import '../../data/remote/api_service.dart';
 import 'audio_handler.dart';
 
+/// Exception thrown when song playback fails due to permission or availability issues.
+class PlaybackException implements Exception {
+  PlaybackException(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 final playbackServiceProvider = Provider<PlaybackService>((ref) {
   return PlaybackService(ref);
 });
@@ -158,8 +167,22 @@ class PlaybackService {
     await _ready; // ensure AudioService.init has completed
     _stopProgressTimer();
     final api = _ref.read(apiServiceProvider);
+    
     // Always fetch fresh URL — never use cache.
-    final url = await api.getSongUrl(song.mid);
+    final resp = await api.getSongUrl(song.mid, song.name); // song.mid is the song ID
+    final code = resp['code'] as int;
+    
+    if (code == 0) {
+      // No playback permission
+      final message = resp['message'] as String? ?? '暂无播放权限';
+      throw PlaybackException(message);
+    }
+    
+    final url = resp['url'] as String?;
+    if (url == null || url.isEmpty) {
+      throw PlaybackException('无法获取播放链接');
+    }
+    
     final mediaItem = song.toMediaItem(url);
     await _handler!.playMediaItem(mediaItem);
     _startProgressTimer(song.mid);

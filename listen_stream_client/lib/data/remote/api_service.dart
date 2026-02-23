@@ -98,11 +98,15 @@ class ApiService {
             })).data!;
 
   // ── Proxy: Song URL (no-cache) ──────────────────────────────────────────────
-  Future<String> getSongUrl(String mid) async {
+  /// Fetches song playback URL with QQ → Joox fallback.
+  /// Returns:
+  ///   Success: {code: 1, message: "Success", url: "...", source: "qq|joox", songmid: "..."}
+  ///   Failure: {code: 0, message: "暂无播放权限", url: null}
+  Future<Map<String, dynamic>> getSongUrl(String songId, String songName) async {
     final r = await _dio.get<Map<String, dynamic>>('/api/song/url',
-        queryParameters: {'mid': mid},
+        queryParameters: {'id': songId, 'name': songName},
         options: Options(extra: {'noCache': true}));
-    return r.data!['url'] as String;
+    return r.data!;
   }
 
 // ── Proxy: Song Detail ─────────────────────────────────────────────────────

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/responsive/responsive.dart';
+import '../../core/player/playback_service.dart';
 import '../../shared/widgets/cover_image.dart';
+import '../../shared/utils/playback_helper.dart';
 import '../../data/remote/api_service.dart';
 import '../../data/local/user_data_service.dart';
 import '../library/providers.dart';
@@ -331,17 +333,71 @@ class SongDetailPage extends ConsumerWidget {
                         ),
 
                         // 播放按钮
-                        FilledButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('播放功能开发中')),
+                        Consumer(
+                          builder: (context, ref, _) {
+                            return FilledButton.icon(
+                              onPressed: () async {
+                                // Get song details to create Song object
+                                final api = ref.read(apiServiceProvider);
+                                try {
+                                  final detailResp = await api.getSongDetail(songMid);
+                                  final d = detailResp['data'] ?? detailResp;
+                                  String title = '未知歌曲';
+                                  String artist = '未知歌手';
+                                  String albumMid = songMid;
+                                  String albumName = '';
+                                  String coverUrl = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000$songMid.jpg';
+
+                                  if (d is Map) {
+                                    final track = d['track_info'];
+                                    if (track is Map) {
+                                      title = track['name']?.toString() ?? title;
+                                      if (track['singer'] is List && track['singer'].isNotEmpty) {
+                                        final s = track['singer'][0];
+                                        if (s is Map && s['name'] != null) {
+                                          artist = s['name'].toString();
+                                        }
+                                      }
+                                      if (track['album'] is Map) {
+                                        final album = track['album'];
+                                        albumMid = album['mid']?.toString() ?? albumMid;
+                                        albumName = album['name']?.toString() ?? '';
+                                        if (albumMid.isNotEmpty) {
+                                          coverUrl = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000$albumMid.jpg';
+                                        }
+                                      }
+                                    }
+                                  }
+
+                                  // Create Song object
+                                  final song = Song(
+                                    mid: songMid,
+                                    name: title,
+                                    artist: artist,
+                                    albumMid: albumMid,
+                                    albumName: albumName,
+                                    coverUrl: coverUrl,
+                                  );
+
+                                  // Play song with error handling
+                                  if (context.mounted) {
+                                    await playSongWithErrorHandling(context, ref, song);
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('加载歌曲信息失败: $e')),
+                                    );
+                                  }
+                                }
+                              },
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text('播放'),
+                              style: FilledButton.styleFrom(
+                                minimumSize: Size(buttonMinWidth, buttonHeight),
+                              ),
                             );
                           },
-                          icon: const Icon(Icons.play_arrow),
-                          label: const Text('播放'),
-                          style: FilledButton.styleFrom(
-                            minimumSize: Size(buttonMinWidth, buttonHeight),
-                          ),
                         ),
 
                         // 添加到歌单按钮

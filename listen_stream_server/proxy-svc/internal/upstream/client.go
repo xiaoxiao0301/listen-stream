@@ -59,6 +59,49 @@ func (c *Client) Do(ctx context.Context, path, rawQuery string) ([]byte, error) 
 	return body, nil
 }
 
+// DoFallback sends a GET request directly to the fallback API URL.
+// Used for Joox search and URL retrieval.
+// Path parameter is typically empty as query contains full request (e.g., "types=search&source=joox&name=...").
+func (c *Client) DoFallback(ctx context.Context, path, rawQuery string) ([]byte, error) {
+	keys, err := c.cfgSvc.GetMany(ctx, []string{cfgAPIFallbackURL})
+	if err != nil {
+		return nil, fmt.Errorf("upstream: read config: %w", err)
+	}
+
+	fallbackURL := keys[cfgAPIFallbackURL]
+	if fallbackURL == "" {
+		return nil, fmt.Errorf("upstream: fallback URL not configured")
+	}
+
+	return c.doRequestRaw(ctx, fallbackURL, path, rawQuery)
+}
+
+// doRequestRaw performs HTTP request without API key (for fallback API).
+func (c *Client) doRequestRaw(ctx context.Context, baseURL, path, rawQuery string) ([]byte, error) {
+	u := baseURL + path
+	if rawQuery != "" {
+		u += "?" + rawQuery
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, fmt.Errorf("upstream: build request: %w", err)
+	}
+	req.Header.Set("User-Agent", "listen-stream/1.0")
+	resp, err := c.cli.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("upstream: http: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("upstream: status %d", resp.StatusCode)
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 4<<20)) // 4 MB cap
+	if err != nil {
+		return nil, fmt.Errorf("upstream: read body: %w", err)
+	}
+	return body, nil
+}
+
 // doRequest performs actual HTTP request with given base URL
 func (c *Client) doRequest(ctx context.Context, baseURL, apiKey, path, rawQuery string) ([]byte, error) {
 	if baseURL == "" {
