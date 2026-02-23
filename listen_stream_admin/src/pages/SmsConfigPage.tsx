@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router'
 import { getSMSConfig, updateSMSConfig } from '@/api/config'
+import { PageHeader } from '@/components/config/PageHeader'
+import { StatusBanner } from '@/components/config/StatusBanner'
 import { Eye, EyeOff, MessageSquare, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -78,27 +80,34 @@ export function SmsConfigPage() {
   }
 
   if (isLoading) {
-    return <div className="p-8 text-slate-400 text-sm">Loading SMS config…</div>
+    return (
+      <div className="space-y-6">
+        <PageHeader title="SMS Configuration" />
+        <div className="bg-white border border-slate-200 rounded-lg h-32 animate-pulse" />
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">SMS 配置</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          控制短信验证码的发送方式。开发模式下仅打印日志，生产模式需要配置 SMS 服务商。
-        </p>
-      </div>
+      <PageHeader
+        title="SMS Configuration"
+        description="控制短信验证码的发送方式。开发模式下仅打印日志，生产模式需要配置 SMS 服务商。"
+      />
 
+      {/* Status Banners */}
       {saveMutation.isError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm">
-          {(saveMutation.error as any)?.response?.data?.message ?? '保存失败'}
-        </div>
+        <StatusBanner
+          type="error"
+          message={(saveMutation.error as any)?.response?.data?.message ?? '保存失败'}
+          dismissible
+          onDismiss={() => saveMutation.reset()}
+        />
       )}
 
       {/* Dev mode toggle card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className={cn(
@@ -151,9 +160,9 @@ export function SmsConfigPage() {
 
       {/* Production config panel (visible when not in dev mode OR when switching off) */}
       {(!isDevMode || editing) && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <span className="font-medium text-slate-800">SMS 服务商配置</span>
+            <span className="font-semibold text-slate-800">SMS 服务商配置</span>
             <div className="flex items-center gap-2">
               {editing ? (
                 <>
@@ -163,14 +172,14 @@ export function SmsConfigPage() {
                       setChanges({})
                       setConfirmOff(false)
                     }}
-                    className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
+                    className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
                   >
                     取消
                   </button>
                   <button
                     onClick={() => saveMutation.mutate()}
                     disabled={saveMutation.isPending || Object.keys(changes).length === 0}
-                    className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                    className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     {saveMutation.isPending ? '保存中…' : '保存'}
                   </button>
@@ -178,7 +187,7 @@ export function SmsConfigPage() {
               ) : (
                 <button
                   onClick={() => setEditing(true)}
-                  className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+                  className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
                   编辑
                 </button>

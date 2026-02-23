@@ -12,14 +12,15 @@ import (
 )
 
 const (
-	cfgAPIBaseURL = "API_BASE_URL"
-	cfgAPIKey     = "API_KEY"
-	cfgCookie     = "COOKIE"
+	cfgAPIBaseURL     = "API_BASE_URL"
+	cfgAPIFallbackURL = "API_FALLBACK_URL"
+	cfgAPIKey         = "API_KEY"
 )
 
 // Client forwards requests to the upstream music API.
-// Base URL and Cookie header are read from ConfigService on each call
+// Base URL, Fallback URL and API Key are read from ConfigService on each call
 // (30 s cache ensures freshness without per-request DB hits).
+// If primary URL fails, automatically retries with fallback URL if configured.
 type Client struct {
 	cfgSvc config.Service
 	cli    *http.Client
@@ -34,13 +35,36 @@ func New(cfgSvc config.Service) *Client {
 }
 
 // Do sends a GET request to {baseURL}{path}?{rawQuery} with the configured
-// Cookie header and returns the response body bytes.
+// API key in Authorization Bearer header and returns the response body bytes.
+// If primary URL fails and fallback URL is configured, retries with fallback.
 func (c *Client) Do(ctx context.Context, path, rawQuery string) ([]byte, error) {
-	keys, err := c.cfgSvc.GetMany(ctx, []string{cfgAPIBaseURL, cfgAPIKey, cfgCookie})
+	keys, err := c.cfgSvc.GetMany(ctx, []string{cfgAPIBaseURL, cfgAPIFallbackURL, cfgAPIKey})
 	if err != nil {
 		return nil, fmt.Errorf("upstream: read config: %w", err)
 	}
-	u := keys[cfgAPIBaseURL] + path
+
+	// Try primary URL first
+	body, err := c.doRequest(ctx, keys[cfgAPIBaseURL], keys[cfgAPIKey], path, rawQuery)
+	if err != nil {
+		// If primary fails and fallback is configured, try fallback
+		if fallbackURL := keys[cfgAPIFallbackURL]; fallbackURL != "" {
+			body, fallbackErr := c.doRequest(ctx, fallbackURL, keys[cfgAPIKey], path, rawQuery)
+			if fallbackErr == nil {
+				return body, nil
+			}
+			// Return original error if fallback also fails
+		}
+		return nil, err
+	}
+	return body, nil
+}
+
+// doRequest performs actual HTTP request with given base URL
+func (c *Client) doRequest(ctx context.Context, baseURL, apiKey, path, rawQuery string) ([]byte, error) {
+	if baseURL == "" {
+		return nil, fmt.Errorf("upstream: base URL not configured")
+	}
+	u := baseURL + path
 	if rawQuery != "" {
 		u += "?" + rawQuery
 	}
@@ -48,11 +72,8 @@ func (c *Client) Do(ctx context.Context, path, rawQuery string) ([]byte, error) 
 	if err != nil {
 		return nil, fmt.Errorf("upstream: build request: %w", err)
 	}
-	if cookie := keys[cfgCookie]; cookie != "" {
-		req.Header.Set("Cookie", cookie)
-	}
-	if apiKey := keys[cfgAPIKey]; apiKey != "" {
-		req.Header.Set("X-Api-Key", apiKey)
+	if apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+apiKey)
 	}
 	req.Header.Set("User-Agent", "listen-stream/1.0")
 	resp, err := c.cli.Do(req)

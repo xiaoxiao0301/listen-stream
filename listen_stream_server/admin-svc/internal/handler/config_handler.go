@@ -44,7 +44,7 @@ func (h *ConfigHandler) Register(rg *gin.RouterGroup) {
 
 // ── API config ────────────────────────────────────────────────────────────────
 
-var apiConfigKeys = []string{"API_BASE_URL", "API_KEY", "COOKIE"}
+var apiConfigKeys = []string{"API_BASE_URL", "API_FALLBACK_URL", "API_KEY"}
 
 func (h *ConfigHandler) getAPIConfig(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -53,10 +53,8 @@ func (h *ConfigHandler) getAPIConfig(c *gin.Context) {
 		jsonErr(c, http.StatusInternalServerError, "INTERNAL_ERROR", "config read failed")
 		return
 	}
-	for _, k := range []string{"API_KEY", "COOKIE"} {
-		if v, ok := vals[k]; ok {
-			vals[k] = util.MaskSecret(v)
-		}
+	if v, ok := vals["API_KEY"]; ok {
+		vals["API_KEY"] = util.MaskSecret(v)
 	}
 	c.JSON(http.StatusOK, vals)
 }
@@ -73,7 +71,7 @@ func (h *ConfigHandler) updateAPIConfig(c *gin.Context) {
 	if claims != nil {
 		updatedBy = claims.Username
 	}
-	allowed := map[string]bool{"API_BASE_URL": true, "API_KEY": true, "COOKIE": true, "COOKIE_REFRESH_CRON": true}
+	allowed := map[string]bool{"API_BASE_URL": true, "API_FALLBACK_URL": true, "API_KEY": true}
 	for k, v := range req {
 		if !allowed[k] {
 			continue
@@ -95,7 +93,6 @@ func (h *ConfigHandler) updateAPIConfig(c *gin.Context) {
 func (h *ConfigHandler) testAPIConnection(c *gin.Context) {
 	ctx := c.Request.Context()
 	baseURL, _ := h.cfgSvc.Get(ctx, "API_BASE_URL")
-	cookie, _ := h.cfgSvc.Get(ctx, "COOKIE")
 	apiKey, _ := h.cfgSvc.Get(ctx, "API_KEY")
 	if baseURL == "" {
 		jsonErr(c, http.StatusBadRequest, "NOT_CONFIGURED", "API_BASE_URL is not set")
@@ -109,11 +106,8 @@ func (h *ConfigHandler) testAPIConnection(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	if cookie != "" {
-		req.Header.Set("Cookie", cookie)
-	}
 	if apiKey != "" {
-		req.Header.Set("X-Api-Key", apiKey)
+		req.Header.Set("Authorization", "Bearer "+apiKey)
 	}
 	resp, err := client.Do(req)
 	latency := time.Since(start).Milliseconds()

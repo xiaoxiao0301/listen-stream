@@ -1,7 +1,52 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getJWTConfig, updateJWTConfig, type ConfigItem } from '@/api/config'
-import { Eye, EyeOff, AlertTriangle } from 'lucide-react'
+import { getJWTConfig, updateJWTConfig } from '@/api/config'
+import { PageHeader } from '@/components/config/PageHeader'
+import { StatusBanner } from '@/components/config/StatusBanner'
+import { ConfigCard } from '@/components/config/ConfigCard'
+import { AlertTriangle, Shield, Clock, Key } from 'lucide-react'
+
+const CONFIG_METADATA = {
+  JWT_SECRET_KEY: {
+    icon: <Key size={20} />,
+    title: 'JWT Secret Key',
+    description: 'Secret key used to sign JWT tokens',
+    sensitive: true,
+  },
+  JWT_EXPIRY_HOURS: {
+    icon: <Clock size={20} />,
+    title: 'JWT Expiry Hours',
+    description: 'Token validity duration in hours',
+    sensitive: false,
+  },
+  JWT_REFRESH_SECRET: {
+    icon: <Shield size={20} />,
+    title: 'JWT Refresh Secret',
+    description: 'Secret key for refresh tokens',
+    sensitive: true,
+  },
+  JWT_REFRESH_EXPIRY_DAYS: {
+    icon: <Clock size={20} />,
+    title: 'Refresh Token Expiry Days',
+    description: 'Refresh token validity duration in days',
+    sensitive: false,
+  },
+}
+
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInMs = now.getTime() - date.getTime()
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+
+  if (diffInMinutes < 1) return 'just now'
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+  if (diffInHours < 24) return `${diffInHours}h ago`
+  if (diffInDays < 7) return `${diffInDays}d ago`
+  return date.toLocaleDateString()
+}
 
 export function JwtConfigPage() {
   const qc = useQueryClient()
@@ -25,6 +70,8 @@ export function JwtConfigPage() {
       setChanges({})
       setConfirmOpen(false)
       setConfirmText('')
+      // Auto-dismiss after 5s
+      setTimeout(() => setAffectedSessions(null), 5000)
     },
   })
 
@@ -43,20 +90,36 @@ export function JwtConfigPage() {
     saveMutation.mutate()
   }
 
+  function handleChange(key: string, value: string) {
+    setChanges((prev) => ({ ...prev, [key]: value }))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="JWT Configuration" />
+        <div className="grid gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white border border-slate-200 rounded-lg h-40 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">JWT Config</h1>
-          <p className="text-sm text-slate-500 mt-0.5">JWT signing secrets and expiry settings</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {!editing ? (
+      {/* Header */}
+      <PageHeader
+        title="JWT Configuration"
+        description="JWT signing secrets and token expiry settings"
+        actions={
+          !editing ? (
             <button
               onClick={() => setEditing(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
-              Edit
+              Edit Configuration
             </button>
           ) : (
             <>
@@ -65,76 +128,80 @@ export function JwtConfigPage() {
                   setEditing(false)
                   setChanges({})
                 }}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveClick}
                 disabled={saveMutation.isPending || Object.keys(changes).length === 0}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Save
+                {saveMutation.isPending ? 'Saving…' : 'Save Changes'}
               </button>
             </>
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
-      {affectedSessions !== null && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-amber-700 text-sm flex items-center gap-2">
-          <AlertTriangle size={15} />
-          JWT secret updated — <strong>{affectedSessions}</strong> active session
-          {affectedSessions !== 1 ? 's' : ''} were invalidated
-        </div>
-      )}
+      {/* Status Banners */}
+      <div className="space-y-3">
+        {affectedSessions !== null && (
+          <StatusBanner
+            type="warning"
+            message={`JWT secret updated — ${affectedSessions} active session${affectedSessions !== 1 ? 's' : ''} ${affectedSessions !== 1 ? 'were' : 'was'} invalidated`}
+            dismissible
+            onDismiss={() => setAffectedSessions(null)}
+          />
+        )}
 
-      {saveMutation.isError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm">
-          {(saveMutation.error as any)?.response?.data?.message ?? 'Save failed'}
-        </div>
-      )}
+        {saveMutation.isError && (
+          <StatusBanner
+            type="error"
+            message={(saveMutation.error as any)?.response?.data?.message ?? 'Failed to save configuration'}
+            dismissible
+            onDismiss={() => saveMutation.reset()}
+          />
+        )}
 
-      {hasJwtSecret && editing && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 text-orange-700 text-sm flex items-center gap-2">
-          <AlertTriangle size={15} />
-          Changing the JWT secret will invalidate all active user sessions immediately.
-        </div>
-      )}
-
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        {isLoading ? (
-          <div className="p-8 text-center text-slate-400 text-sm">Loading config…</div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Key
-                </th>
-                <th className="text-left py-3 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Value
-                </th>
-                <th className="py-3 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide text-right">
-                  Updated
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <JwtRow
-                  key={item.key}
-                  item={item}
-                  editing={editing}
-                  onChange={(val) => setChanges((c) => ({ ...c, [item.key]: val }))}
-                />
-              ))}
-            </tbody>
-          </table>
+        {hasJwtSecret && editing && (
+          <StatusBanner
+            type="warning"
+            message="Changing the JWT secret will invalidate all active user sessions immediately."
+          />
         )}
       </div>
 
-      {/* Confirmation dialog */}
+      {/* Configuration Cards */}
+      <div className="grid gap-4">
+        {items.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-lg p-12 text-center">
+            <p className="text-slate-400">No configuration entries found.</p>
+          </div>
+        ) : (
+          items.map((item) => {
+            const metadata = CONFIG_METADATA[item.key as keyof typeof CONFIG_METADATA]
+            if (!metadata) return null
+
+            return (
+              <ConfigCard
+                key={item.key}
+                icon={metadata.icon}
+                title={metadata.title}
+                configKey={item.key}
+                value={changes[item.key] ?? item.value}
+                description={metadata.description}
+                updatedAt={formatRelativeTime(item.updated_at)}
+                isSensitive={metadata.sensitive}
+                isEditing={editing}
+                onChange={(value) => handleChange(item.key, value)}
+              />
+            )
+          })
+        )}
+      </div>
+
+      {/* Confirmation Dialog */}
       {confirmOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
@@ -152,6 +219,7 @@ export function JwtConfigPage() {
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder="Type CONFIRM"
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
@@ -159,14 +227,14 @@ export function JwtConfigPage() {
                   setConfirmOpen(false)
                   setConfirmText('')
                 }}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
+                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={confirmText.trim() !== 'CONFIRM' || saveMutation.isPending}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {saveMutation.isPending ? 'Saving…' : 'Confirm & Save'}
               </button>
@@ -175,54 +243,5 @@ export function JwtConfigPage() {
         </div>
       )}
     </div>
-  )
-}
-
-function JwtRow({
-  item,
-  editing,
-  onChange,
-}: {
-  item: ConfigItem
-  editing: boolean
-  onChange: (val: string) => void
-}) {
-  const [revealed, setRevealed] = useState(false)
-  const isSensitive = item.key.toLowerCase().includes('secret')
-
-  const display =
-    revealed || !isSensitive
-      ? item.value
-      : item.value.slice(0, 6) + '•'.repeat(32) + item.value.slice(-4)
-
-  return (
-    <tr className="border-b border-slate-100 last:border-0">
-      <td className="py-3 pl-4 pr-4 text-sm font-mono text-slate-600 whitespace-nowrap">{item.key}</td>
-      <td className="py-3 pr-4 w-full">
-        {editing ? (
-          <input
-            type={isSensitive && !revealed ? 'password' : 'text'}
-            defaultValue={item.value}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        ) : (
-          <span className="flex items-center gap-1.5">
-            <span className="font-mono text-sm text-slate-800">{display || '—'}</span>
-            {isSensitive && item.value && (
-              <button
-                onClick={() => setRevealed((r) => !r)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                {revealed ? <EyeOff size={13} /> : <Eye size={13} />}
-              </button>
-            )}
-          </span>
-        )}
-      </td>
-      <td className="py-3 pr-4 text-xs text-slate-400 whitespace-nowrap text-right">
-        {new Date(item.updated_at).toLocaleDateString()}
-      </td>
-    </tr>
   )
 }

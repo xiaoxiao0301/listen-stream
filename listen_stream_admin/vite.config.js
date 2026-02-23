@@ -18,6 +18,13 @@ export default defineConfig({
             '/admin': {
                 target: 'http://localhost:8004',
                 changeOrigin: true,
+                // Only proxy API/XHR calls. Browser navigations (Accept: text/html)
+                // must be served by Vite so the SPA router handles the URL.
+                bypass(req) {
+                    if (req.headers['accept']?.includes('text/html')) {
+                        return '/index.html';
+                    }
+                },
             },
         },
     },

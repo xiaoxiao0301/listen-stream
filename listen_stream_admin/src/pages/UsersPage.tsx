@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listUsers, setUserStatus, getUserDevices, revokeDevice, type User, type Device } from '@/api/users'
+import { PageHeader } from '@/components/config/PageHeader'
+import { StatusBanner } from '@/components/config/StatusBanner'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronRight, Search, Smartphone, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Search, Smartphone, X, Users as UsersIcon } from 'lucide-react'
 
 function StatusBadge({ disabled }: { disabled: boolean }) {
   return (
@@ -73,7 +75,7 @@ function DevicesRow({ userId, onRevoke }: { userId: string; onRevoke: () => void
             <button
               onClick={() => revokeMutation.mutate(device.device_id)}
               disabled={revokeMutation.isPending}
-              className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
+              className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 disabled:opacity-50 transition-colors"
             >
               <X size={12} /> Revoke
             </button>
@@ -127,51 +129,78 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Users</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {total.toLocaleString()} total users
-          </p>
-        </div>
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search by phone…"
-              className="pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            Search
-          </button>
-          {phone && (
+      {/* Header */}
+      <PageHeader
+        title="User Management"
+        description={`${total.toLocaleString()} total users`}
+        actions={
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search by phone…"
+                className="pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
+              />
+            </div>
             <button
-              type="button"
-              onClick={() => {
-                setPhone('')
-                setSearchInput('')
-                setPage(1)
-              }}
-              className="px-3 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
+              type="submit"
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
-              Clear
+              Search
             </button>
-          )}
-        </form>
-      </div>
+            {phone && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhone('')
+                  setSearchInput('')
+                  setPage(1)
+                }}
+                className="px-3 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </form>
+        }
+      />
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      {/* Status Banners */}
+      {statusMutation.isSuccess && (
+        <StatusBanner
+          type="success"
+          message="User status updated successfully"
+          dismissible
+          onDismiss={() => statusMutation.reset()}
+        />
+      )}
+
+      {statusMutation.isError && (
+        <StatusBanner
+          type="error"
+          message={(statusMutation.error as any)?.response?.data?.message ?? 'Failed to update user status'}
+          dismissible
+          onDismiss={() => statusMutation.reset()}
+        />
+      )}
+
+      {/* Users Table */}
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-slate-400 text-sm">Loading users…</div>
         ) : users.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">No users found</div>
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
+              <UsersIcon size={20} className="text-slate-400" />
+            </div>
+            <p className="text-slate-600 text-sm font-medium">No users found</p>
+            <p className="text-slate-400 text-xs mt-1">
+              {phone ? 'Try a different search query' : 'No users in the system yet'}
+            </p>
+          </div>
         ) : (
           <table className="w-full">
             <thead>
@@ -201,7 +230,7 @@ export function UsersPage() {
                     <td className="pl-3">
                       <button
                         onClick={() => toggleExpand(user.id)}
-                        className="text-slate-400 hover:text-slate-600 p-1"
+                        className="text-slate-400 hover:text-slate-600 p-1 transition-colors"
                       >
                         {expandedUsers.has(user.id) ? (
                           <ChevronDown size={14} />
@@ -255,6 +284,7 @@ export function UsersPage() {
         )}
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-slate-600">
           <span>

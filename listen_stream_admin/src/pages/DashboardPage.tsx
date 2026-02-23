@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getOverview } from '@/api/stats'
+import { PageHeader } from '@/components/config/PageHeader'
+import { StatusBanner } from '@/components/config/StatusBanner'
 import {
   AreaChart,
   Area,
@@ -9,7 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { AlertTriangle, Users, Activity, Clock } from 'lucide-react'
+import { Users, Activity, Clock } from 'lucide-react'
 
 function StatCard({
   title,
@@ -23,7 +25,7 @@ function StatCard({
   accent?: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-start gap-4">
+    <div className="bg-white rounded-lg border border-slate-200 p-5 flex items-start gap-4 hover:border-slate-300 transition-colors">
       <div className={`p-2.5 rounded-lg ${accent ?? 'bg-blue-50'}`}>
         <Icon size={20} className={accent ? 'text-white' : 'text-blue-600'} />
       </div>
@@ -44,11 +46,14 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+      <div className="space-y-6">
+        <PageHeader
+          title="Dashboard"
+          description="System overview and metrics"
+        />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 h-24 animate-pulse">
+            <div key={i} className="bg-white rounded-lg border border-slate-200 p-5 h-24 animate-pulse">
               <div className="bg-slate-100 h-4 w-24 rounded mb-2" />
               <div className="bg-slate-200 h-7 w-16 rounded" />
             </div>
@@ -60,11 +65,15 @@ export function DashboardPage() {
 
   if (error) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-red-700 text-sm">
-          Failed to load stats. The backend may be unavailable.
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Dashboard"
+          description="System overview and metrics"
+        />
+        <StatusBanner
+          type="error"
+          message="Failed to load stats. The backend may be unavailable."
+        />
       </div>
     )
   }
@@ -77,16 +86,21 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        {data?.cookie_alert && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
-            <AlertTriangle size={15} />
-            Cookie alert active — check API Config
-          </div>
-        )}
-      </div>
+      {/* Header */}
+      <PageHeader
+        title="Dashboard"
+        description="System overview and real-time metrics"
+      />
 
+      {/* Cookie Alert */}
+      {data?.cookie_alert && (
+        <StatusBanner
+          type="warning"
+          message="Cookie alert active — check API Config"
+        />
+      )}
+
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Total Users"
@@ -118,8 +132,9 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* Chart */}
       {chartData.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
           <h2 className="text-sm font-semibold text-slate-700 mb-4">Requests by Hour (Today)</h2>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={chartData}>

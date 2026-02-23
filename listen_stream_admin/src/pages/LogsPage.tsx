@@ -6,8 +6,9 @@ import {
   type OperationLog,
   type ProxyLog,
 } from '@/api/logs'
+import { PageHeader } from '@/components/config/PageHeader'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, ScrollText } from 'lucide-react'
 
 const PAGE_SIZE = 30
 
@@ -34,7 +35,7 @@ function MaskedDiff({ before, after }: { before: string; after: string }) {
       const obj = JSON.parse(val)
       const masked = Object.fromEntries(
         Object.entries(obj).map(([k, v]) => {
-          const sensitive = ['secret', 'password', 'key', 'cookie', 'token'].some((s) =>
+          const sensitive = ['secret', 'password', 'key', 'token'].some((s) =>
             k.toLowerCase().includes(s)
           )
           return [k, sensitive && !revealed ? '••••••' : v]
@@ -50,7 +51,7 @@ function MaskedDiff({ before, after }: { before: string; after: string }) {
     <div className="space-y-2">
       <button
         onClick={() => setRevealed((r) => !r)}
-        className="text-xs text-blue-600 hover:underline"
+        className="text-xs text-blue-600 hover:underline transition-colors"
       >
         {revealed ? 'Hide values' : 'Reveal values'}
       </button>
@@ -99,9 +100,15 @@ function OperationLogsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {logs.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">No operation logs yet</div>
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
+              <ScrollText size={20} className="text-slate-400" />
+            </div>
+            <p className="text-slate-600 text-sm font-medium">No operation logs yet</p>
+            <p className="text-slate-400 text-xs mt-1">Admin operations will appear here</p>
+          </div>
         ) : (
           <table className="w-full">
             <thead>
@@ -131,7 +138,7 @@ function OperationLogsTab() {
                     <td className="pl-3">
                       <button
                         onClick={() => toggleExpand(log.id)}
-                        className="text-slate-400 hover:text-slate-600 p-1"
+                        className="text-slate-400 hover:text-slate-600 p-1 transition-colors"
                         disabled={!log.before_value && !log.after_value}
                       >
                         {expanded.has(log.id) ? (
@@ -171,14 +178,14 @@ function OperationLogsTab() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               ← Prev
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next →
             </button>
@@ -206,9 +213,15 @@ function ProxyLogsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {logs.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">No proxy logs yet</div>
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
+              <ScrollText size={20} className="text-slate-400" />
+            </div>
+            <p className="text-slate-600 text-sm font-medium">No proxy logs yet</p>
+            <p className="text-slate-400 text-xs mt-1">API requests will be logged here</p>
+          </div>
         ) : (
           <table className="w-full">
             <thead>
@@ -256,14 +269,14 @@ function ProxyLogsTab() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               ← Prev
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next →
             </button>
@@ -279,10 +292,10 @@ export function LogsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Logs</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Admin operation history and proxy request logs</p>
-      </div>
+      <PageHeader
+        title="System Logs"
+        description="Admin operation history and proxy request logs"
+      />
 
       <div className="flex gap-1 border-b border-slate-200 pb-px">
         {(['operation', 'proxy'] as const).map((t) => (

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getSMSRecords, clearSMSRecords, type SMSRecord } from '@/api/config'
-import { RefreshCw, Trash2 } from 'lucide-react'
+import { PageHeader } from '@/components/config/PageHeader'
+import { StatusBanner } from '@/components/config/StatusBanner'
+import { RefreshCw, Trash2, AlertTriangle } from 'lucide-react'
 
 export function SmsLogsPage() {
   const qc = useQueryClient()
@@ -28,61 +30,82 @@ export function SmsLogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">SMS 日志</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            开发模式下发送的短信验证码。每 10s 自动刷新，最多保留 200 条。
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400">上次更新 {lastUpdated}</span>
-          <button
-            onClick={() => qc.invalidateQueries({ queryKey: ['sms-records'] })}
-            disabled={isFetching}
-            className="flex items-center gap-1.5 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
-            刷新
-          </button>
-          {!confirmClear ? (
+      <PageHeader
+        title="SMS Logs"
+        description="开发模式下发送的短信验证码。每 10s 自动刷新，最多保留 200 条。"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400">上次更新 {lastUpdated}</span>
             <button
-              onClick={() => setConfirmClear(true)}
-              disabled={records.length === 0}
-              className="flex items-center gap-1.5 px-3 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-40"
+              onClick={() => qc.invalidateQueries({ queryKey: ['sms-records'] })}
+              disabled={isFetching}
+              className="flex items-center gap-1.5 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50 transition-colors"
             >
-              <Trash2 size={14} />
-              清空
+              <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
+              刷新
             </button>
-          ) : (
-            <>
-              <span className="text-sm text-red-600 font-medium">确认清空？</span>
+            {!confirmClear ? (
               <button
-                onClick={() => clearMutation.mutate()}
-                disabled={clearMutation.isPending}
-                className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
+                onClick={() => setConfirmClear(true)}
+                disabled={records.length === 0}
+                className="flex items-center gap-1.5 px-3 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-40 transition-colors"
               >
-                {clearMutation.isPending ? '清空中…' : '确认'}
+                <Trash2 size={14} />
+                清空
               </button>
-              <button
-                onClick={() => setConfirmClear(false)}
-                className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                取消
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+            ) : (
+              <>
+                <span className="text-sm text-red-600 font-medium">确认清空？</span>
+                <button
+                  onClick={() => clearMutation.mutate()}
+                  disabled={clearMutation.isPending}
+                  className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {clearMutation.isPending ? '清空中…' : '确认'}
+                </button>
+                <button
+                  onClick={() => setConfirmClear(false)}
+                  className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition-colors"
+                >
+                  取消
+                </button>
+              </>
+            )}
+          </div>
+        }
+      />
+
+      {/* Success Banner */}
+      {clearMutation.isSuccess && (
+        <StatusBanner
+          type="success"
+          message="SMS logs cleared successfully"
+          dismissible
+          onDismiss={() => clearMutation.reset()}
+        />
+      )}
+
+      {/* Error Banner */}
+      {clearMutation.isError && (
+        <StatusBanner
+          type="error"
+          message={(clearMutation.error as any)?.response?.data?.message ?? '清空失败'}
+          dismissible
+          onDismiss={() => clearMutation.reset()}
+        />
+      )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-slate-400 text-sm">加载中…</div>
         ) : records.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-slate-400 text-sm">暂无记录</p>
-            <p className="text-slate-300 text-xs mt-1">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
+              <AlertTriangle size={20} className="text-slate-400" />
+            </div>
+            <p className="text-slate-600 text-sm font-medium">暂无记录</p>
+            <p className="text-slate-400 text-xs mt-1">
               开启开发模式后，发送验证码时记录将出现在此处
             </p>
           </div>
@@ -122,7 +145,7 @@ function SmsRow({ record }: { record: SMSRecord }) {
   const expired = !isNaN(dt.getTime()) && Date.now() - dt.getTime() > 5 * 60 * 1000
 
   return (
-    <tr className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+    <tr className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
       <td className="py-3 px-4 font-mono text-sm text-slate-700">{record.phone}</td>
       <td className="py-3 px-4">
         <span className="inline-block font-mono text-lg font-semibold tracking-[0.2em] text-blue-600">

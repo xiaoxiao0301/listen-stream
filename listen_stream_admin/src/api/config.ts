@@ -7,7 +7,7 @@ export interface ConfigItem {
 }
 
 // Keys to always display, even when absent from the DB (value will be empty string)
-const API_CONFIG_KEYS = ['API_BASE_URL', 'API_KEY', 'COOKIE']
+const API_CONFIG_KEYS = ['API_BASE_URL', 'API_FALLBACK_URL', 'API_KEY']
 const JWT_CONFIG_KEYS = ['USER_JWT_SECRET', 'ADMIN_JWT_SECRET', 'ACCESS_TOKEN_TTL', 'REFRESH_TOKEN_TTL', 'MAX_DEVICES']
 const SMS_CONFIG_KEYS = ['SMS_PROVIDER', 'SMS_APP_ID', 'SMS_APP_KEY', 'SMS_SIGN_NAME', 'SMS_TEMPLATE']
 
