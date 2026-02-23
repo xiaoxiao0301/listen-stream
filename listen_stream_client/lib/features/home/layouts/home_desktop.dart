@@ -35,43 +35,79 @@ class HomeDesktopLayout extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 24, bottom: 32),
           children: [
-            // ── Banner + Quick Navigation (Side by Side) ─────────────────
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Banner (左侧，占据 2/3 宽度)
-                Expanded(
-                  flex: 2,
-                  child: ref.watch(bannerProvider).when(
-                    data: (items) => BannerSection(items: items),
-                    loading: () => const LoadingShimmer(height: 240),
-                    error: (e, _) => AppErrorWidget(
-                      onRetry: () => ref.invalidate(bannerProvider),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 24),
-
-                // Quick Navigation (右侧，占据 1/3 宽度)
-                Expanded(
-                  flex: 1,
-                  child: _QuickNavGrid(context),
-                ),
-              ],
+            // ── Banner (Full Width) ───────────────────────────────────────
+            ref.watch(bannerProvider).when(
+              data: (items) => BannerSection(items: items),
+              loading: () => const LoadingShimmer(height: 280),
+              error: (e, _) => AppErrorWidget(
+                onRetry: () => ref.invalidate(bannerProvider),
+              ),
             ),
 
             const SizedBox(height: 32),
 
-            // ── Recommend Playlist (Grid) ─────────────────────────────────
+            // ── Quick Navigation ──────────────────────────────────────────
+            _QuickNavRow(context),
+
+            const SizedBox(height: 40),
+
+            // ── Featured Content (3 Column) ───────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Recommend Playlists
+                Expanded(
+                  child: ref.watch(recommendPlaylistProvider).when(
+                    data: (items) => _PlaylistGridSection(
+                      title: '推荐歌单',
+                      items: items.take(6).toList(),
+                    ),
+                    loading: () => const LoadingShimmer(height: 320),
+                    error: (e, _) => const SizedBox.shrink(),
+                  ),
+                ),
+                
+                SizedBox(width: gridSpacing),
+                
+                // New Songs
+                Expanded(
+                  child: ref.watch(recommendNewSongsProvider).when(
+                    data: (items) => _SongGridSection(
+                      title: '新歌首发',
+                      items: items.take(6).toList(),
+                    ),
+                    loading: () => const LoadingShimmer(height: 320),
+                    error: (e, _) => const SizedBox.shrink(),
+                  ),
+                ),
+                
+                SizedBox(width: gridSpacing),
+                
+                // New Albums
+                Expanded(
+                  child: ref.watch(recommendNewAlbumsProvider).when(
+                    data: (items) => _AlbumGridSection(
+                      title: '新碟上架',
+                      items: items.take(6).toList(),
+                    ),
+                    loading: () => const LoadingShimmer(height: 320),
+                    error: (e, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 40),
+
+            // ── More Playlists (Grid View) ────────────────────────────────
             const SectionHeader(
-              title: '推荐歌单',
+              title: '更多推荐歌单',
               padding: EdgeInsets.zero,
             ),
             const SizedBox(height: 16),
             ref.watch(recommendPlaylistProvider).when(
-              data: (items) => ResponsiveGridView(
-                itemCount: items.length,
+              data: (items) => items.length <= 6 ? const SizedBox.shrink() : ResponsiveGridView(
+                itemCount: items.length > 6 ? items.skip(6).length : 0,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 padding: EdgeInsets.zero,
@@ -81,7 +117,7 @@ class HomeDesktopLayout extends ConsumerWidget {
                 desktopColumns: ResponsiveGrid.playlistColumns(context),
                 tvColumns: 6,
                 itemBuilder: (_, index) {
-                  final item = items[index];
+                  final item = items[index + 6];
                   return PlaylistCard(
                     imageUrl: item.coverUrl,
                     title: item.title,
@@ -93,40 +129,6 @@ class HomeDesktopLayout extends ConsumerWidget {
               loading: () => const LoadingShimmer(height: 280),
               error: (e, _) => const SizedBox.shrink(),
             ),
-
-            const SizedBox(height: 32),
-
-            // ── New Songs + New Albums (Side by Side) ─────────────────────
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // New Songs (左侧)
-                Expanded(
-                  child: ref.watch(recommendNewSongsProvider).when(
-                    data: (items) => _SongGridSection(
-                      title: '新歌首发',
-                      items: items.take(6).toList(),
-                    ),
-                    loading: () => const LoadingShimmer(height: 280),
-                    error: (e, _) => const SizedBox.shrink(),
-                  ),
-                ),
-
-                SizedBox(width: gridSpacing),
-
-                // New Albums (右侧)
-                Expanded(
-                  child: ref.watch(recommendNewAlbumsProvider).when(
-                    data: (items) => _AlbumGridSection(
-                      title: '新碟上架',
-                      items: items.take(6).toList(),
-                    ),
-                    loading: () => const LoadingShimmer(height: 280),
-                    error: (e, _) => const SizedBox.shrink(),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -134,60 +136,159 @@ class HomeDesktopLayout extends ConsumerWidget {
   }
 }
 
-// ── Quick Navigation Grid ───────────────────────────────────────────────────
-Widget _QuickNavGrid(BuildContext context) {
-  return Card(
-    elevation: 0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-      side: BorderSide(
-        color: Theme.of(context).colorScheme.outlineVariant,
+// ── Quick Navigation Row ────────────────────────────────────────────────────
+Widget _QuickNavRow(BuildContext context) {
+  return Row(
+    children: [
+      Expanded(
+        child: _QuickNavCard(
+          context,
+          icon: Icons.trending_up,
+          label: '排行榜',
+          description: '热门音乐排行',
+          gradient: LinearGradient(
+            colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+          ),
+          onTap: () => context.push('/ranking'),
+        ),
       ),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(24),
+      const SizedBox(width: 16),
+      Expanded(
+        child: _QuickNavCard(
+          context,
+          icon: Icons.radio,
+          label: '电台',
+          description: '精选电台节目',
+          gradient: LinearGradient(
+            colors: [Color(0xFF4E9FFF), Color(0xFF6BB6FF)],
+          ),
+          onTap: () => context.push('/radio'),
+        ),
+      ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: _QuickNavCard(
+          context,
+          icon: Icons.person,
+          label: '歌手',
+          description: '发现优秀歌手',
+          gradient: LinearGradient(
+            colors: [Color(0xFF9B7EFF), Color(0xFFB89FFF)],
+          ),
+          onTap: () => context.push('/singer-list'),
+        ),
+      ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: _QuickNavCard(
+          context,
+          icon: Icons.video_library,
+          label: 'MV',
+          description: '精彩视频推荐',
+          gradient: LinearGradient(
+            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+          ),
+          onTap: () => context.push('/mv-list'),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _QuickNavCard(
+  BuildContext context, {
+  required IconData icon,
+  required String label,
+  required String description,
+  required Gradient gradient,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(16),
+    child: Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '快速入口',
-            style: Theme.of(context).textTheme.titleLarge,
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 32,
           ),
-          const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.5,
-            children: [
-              NavItem(
-                icon: Icons.trending_up,
-                label: '排行榜',
-                onTap: () => context.push('/ranking'),
-              ),
-              NavItem(
-                icon: Icons.radio,
-                label: '电台',
-                onTap: () => context.push('/radio'),
-              ),
-              NavItem(
-                icon: Icons.person,
-                label: '歌手',
-                onTap: () => context.push('/singer-list'),
-              ),
-              NavItem(
-                icon: Icons.video_library,
-                label: 'MV',
-                onTap: () => context.push('/mv-list'),
-              ),
-            ],
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 13,
+            ),
           ),
         ],
       ),
     ),
   );
+}
+
+// ── Playlist Grid Section ───────────────────────────────────────────────────
+class _PlaylistGridSection extends StatelessWidget {
+  const _PlaylistGridSection({required this.title, required this.items});
+  final String title;
+  final List<PlaylistItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          title: title,
+          padding: EdgeInsets.zero,
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.0,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: items.length,
+          itemBuilder: (_, i) {
+            final item = items[i];
+            return PlaylistCard(
+              imageUrl: item.coverUrl,
+              title: item.title,
+              creator: item.creatorNick,
+              onTap: () => context.push('/playlist/${item.id}'),
+            );
+          },
+        ),
+      ],
+    );
+  }
 }
 
 // ── Song Grid Section ───────────────────────────────────────────────────────
@@ -238,8 +339,16 @@ class _SongGridSection extends StatelessWidget {
                     ),
                   ),
                 ),
-                title: Text(item.name),
-                subtitle: Text(item.displayArtist),
+                title: Text(
+                  item.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  item.displayArtist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: IconButton(
                   icon: const Icon(Icons.play_circle_outline),
                   onPressed: () => context.push('/song/${item.mid}'),
@@ -302,8 +411,16 @@ class _AlbumGridSection extends StatelessWidget {
                     ),
                   ),
                 ),
-                title: Text(item.name),
-                subtitle: Text(item.displayArtist),
+                title: Text(
+                  item.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  item.displayArtist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: IconButton(
                   icon: const Icon(Icons.album_outlined),
                   onPressed: () => context.push('/album/${item.mid}'),

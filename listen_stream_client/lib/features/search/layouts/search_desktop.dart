@@ -229,16 +229,21 @@ class _SearchDesktopLayoutState extends ConsumerState<SearchDesktopLayout>
                         song.songName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 14),
                       ),
                       subtitle: Text(
                         '${song.singerName} · ${song.albumName}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(song.durationText),
+                          Text(
+                            song.durationText,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                           const SizedBox(width: 16),
                           IconButton(
                             icon: const Icon(Icons.play_circle_outline),

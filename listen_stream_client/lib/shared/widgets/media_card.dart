@@ -129,7 +129,8 @@ class _MediaCardState extends State<MediaCard> {
                   ),
                 ),
                 // Text area with fixed padding
-                Padding(
+                Flexible(
+                  child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +143,7 @@ class _MediaCardState extends State<MediaCard> {
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
                       // 副标题
@@ -153,10 +155,12 @@ class _MediaCardState extends State<MediaCard> {
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 12,
                           ),
                         ),
                       ],
                     ],
+                  ),
                   ),
                 ),
               ],

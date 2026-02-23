@@ -363,8 +363,14 @@ class ResponsiveFontScale {
   /// 应用字体缩放到文字样式
   static TextStyle applyScale(BuildContext context, TextStyle style) {
     final scale = ResponsiveFontScale.scale(context);
+    final baseFontSize = style.fontSize ?? 14.0;
+    final scaledFontSize = baseFontSize * scale;
+    
+    // Ensure fontSize is finite to prevent assertion errors
+    final safeFontSize = scaledFontSize.isFinite ? scaledFontSize : 14.0;
+    
     return style.copyWith(
-      fontSize: (style.fontSize ?? 14) * scale,
+      fontSize: safeFontSize,
       height: style.height, // 保持行高比例不变
     );
   }

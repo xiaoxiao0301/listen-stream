@@ -46,37 +46,73 @@ class _HomeMobileLayoutState extends ConsumerState<HomeMobileLayout> {
                 AppErrorWidget(onRetry: () => ref.invalidate(bannerProvider)),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // ── Quick Navigation ────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
               children: [
-                NavItem(
-                  icon: Icons.trending_up,
-                  label: '排行榜',
-                  onTap: () => context.push('/ranking'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickNavCard(
+                        context,
+                        icon: Icons.trending_up,
+                        label: '排行榜',
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+                        ),
+                        onTap: () => context.push('/ranking'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _QuickNavCard(
+                        context,
+                        icon: Icons.radio,
+                        label: '电台',
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4E9FFF), Color(0xFF6BB6FF)],
+                        ),
+                        onTap: () => context.push('/radio'),
+                      ),
+                    ),
+                  ],
                 ),
-                NavItem(
-                  icon: Icons.radio,
-                  label: '电台',
-                  onTap: () => context.push('/radio'),
-                ),
-                NavItem(
-                  icon: Icons.person,
-                  label: '歌手',
-                  onTap: () => context.push('/singer-list'),
-                ),
-                NavItem(
-                  icon: Icons.video_library,
-                  label: 'MV',
-                  onTap: () => context.push('/mv-list'),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickNavCard(
+                        context,
+                        icon: Icons.person,
+                        label: '歌手',
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF9B7EFF), Color(0xFFB89FFF)],
+                        ),
+                        onTap: () => context.push('/singer-list'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _QuickNavCard(
+                        context,
+                        icon: Icons.video_library,
+                        label: 'MV',
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                        ),
+                        onTap: () => context.push('/mv-list'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+
+          const SizedBox(height: 24),
 
           // ── Recommend Playlist ──────────────────────────────────────────
           ref.watch(recommendPlaylistProvider).when(
@@ -125,6 +161,52 @@ class _HomeMobileLayoutState extends ConsumerState<HomeMobileLayout> {
       ),
     );
   }
+}
+
+// ── Quick Nav Card ──────────────────────────────────────────────────────────
+Widget _QuickNavCard(
+  BuildContext context, {
+  required IconData icon,
+  required String label,
+  required Gradient gradient,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(12),
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 28,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // ── Playlist Section ────────────────────────────────────────────────────────

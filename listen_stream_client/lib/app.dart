@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/auth/auth_notifier.dart';
 import 'core/auth/auth_state.dart';
+import 'core/theme/theme_provider.dart';
 import 'features/auth/page.dart';
 import 'features/home/page.dart';
 import 'features/library/page.dart';
@@ -108,10 +109,13 @@ class ListenStreamApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(_router);
+    final themeMode = ref.watch(themeProvider);
+    
     return MaterialApp.router(
       title: 'Listen Stream',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppTheme.getTheme(themeMode),
+      darkTheme: AppTheme.getTheme(themeMode),
+      themeMode: ThemeMode.dark,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -133,10 +137,22 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
-  int _selectedIndex = 0;
+  int get _selectedIndex {
+    final location = GoRouterState.of(context).uri.path;
+    if (location == '/' || location.startsWith('/ranking') || 
+        location.startsWith('/radio') || location.startsWith('/singer') ||
+        location.startsWith('/playlist') || location.startsWith('/album') ||
+        location.startsWith('/song') || location.startsWith('/mv')) {
+      return 0;
+    } else if (location == '/search') {
+      return 1;
+    } else if (location == '/library') {
+      return 2;
+    }
+    return 0;
+  }
 
   void _onDestinationSelected(int index) {
-    setState(() => _selectedIndex = index);
     switch (index) {
       case 0:
         context.go('/');

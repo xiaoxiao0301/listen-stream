@@ -97,7 +97,7 @@ class _SingerDetailState extends ConsumerState<_SingerDetail> {
                     title: Text(
                       singer['name'] as String? ?? '',
                       style: TextStyle(
-                        fontSize: isMobile ? 16 : 20,
+                        fontSize: isMobile ? 16.0 : 20.0,
                         shadows: const [
                           Shadow(
                             offset: Offset(0, 1),
@@ -233,10 +233,23 @@ class _SongsList extends ConsumerWidget {
         return AdaptiveContainer(
           maxWidthDesktop: 1280,
           maxWidthTv: 1600,
-          padding: isMobile ? EdgeInsets.zero : null,
-          child: ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (_, i) {
+          padding: isMobile ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  '共 ${songs.length} 首歌曲',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: songs.length,
+                  itemBuilder: (_, i) {
                 final s = songs[i];
                 final songName = s['name'] as String? ?? '';
                 String singerName = '';
@@ -286,11 +299,13 @@ class _SongsList extends ConsumerWidget {
                       songName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 14),
                     ),
                     subtitle: Text(
                       singerName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
                     ),
                     trailing: !isMobile
                         ? Row(
@@ -340,7 +355,10 @@ class _SongsList extends ConsumerWidget {
                 );
               },
             ),
-          );
+              ),
+            ],
+          ),
+        );
       },
     );
   }

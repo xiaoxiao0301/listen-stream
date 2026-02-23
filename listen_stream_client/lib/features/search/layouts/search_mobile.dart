@@ -198,13 +198,18 @@ class _SearchMobileLayoutState extends ConsumerState<SearchMobileLayout>
                   song.songName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14),
                 ),
                 subtitle: Text(
                   '${song.singerName} · ${song.albumName}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12),
                 ),
-                trailing: Text(song.durationText),
+                trailing: Text(
+                  song.durationText,
+                  style: const TextStyle(fontSize: 12),
+                ),
                 onTap: () {
                   // TODO: Play song
                 },

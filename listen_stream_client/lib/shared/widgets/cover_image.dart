@@ -24,6 +24,26 @@ class CoverImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure imageUrl is not empty
+    if (imageUrl.isEmpty) {
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: placeholderColor,
+          shape: shape,
+          borderRadius: shape == BoxShape.rectangle
+              ? BorderRadius.circular(borderRadius)
+              : null,
+        ),
+        child: Icon(
+          Icons.music_note,
+          size: (width ?? 48) * 0.4,
+          color: Colors.grey[400],
+        ),
+      );
+    }
+    
     Widget image = Image.network(
       imageUrl,
       width: width,
