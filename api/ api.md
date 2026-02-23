@@ -298,6 +298,71 @@ method: GET
 reponse file: ./song_detail.json
 ```
 
+## Song Url
+
+歌曲播放链接
+
+可以获取到播放链接的
+```
+url: /song/url?id=000RUod52SSa9F
+method: GET
+Header[Cookie]= "Cookie Value" // 后台配置， API Config页面 
+response:
+{
+    "code": 1,
+    "message": "Success",
+    "data": {
+        "url": "https://dl.stream.qqmusic.qq.com/C400000RUod52SSa9F.m4a?guid=8117976891&vkey=4D9DAE4BF660EDC0DCF4ED6A2A51DBD02849EC5587CD977246A5FA43B4CD571516EDEB416921CE437CE6F722496104E107A33F43A1392850__v21519284e&uin=934247610&fromtag=120032",
+        "songmid": "000RUod52SSa9F",
+        "vkey": "4D9DAE4BF660EDC0DCF4ED6A2A51DBD02849EC5587CD977246A5FA43B4CD571516EDEB416921CE437CE6F722496104E107A33F43A1392850__v21519284e",
+        "filename": "C400000RUod52SSa9F.m4a",
+        "source": "purl"
+    }
+}
+
+```
+获取播放链接失败的
+```
+url: /song/url?id=00061J2t0b0PPW
+method: GET
+Header[Cookie]= "Cookie Value" // 后台配置， API Config页面 
+response:
+{
+    "code": 0,
+    "message": "VIP-only content or not available in your region",
+    "data": []
+}
+
+```
+
+返回 code 为0时，
+第一步 需要拼接 API Fallback URL + '?types=search&source=joox&name={$songName}' 来获取查询到歌曲信息
+```
+[
+    {
+        "id": "xxxx",
+        "name": "",
+        "artist": [],
+        "album": "",
+        "pic_id":"",
+        "url_id":"",
+        "lyric_id":"",
+        "source":"joox",
+        "from":"xx"
+    },
+    {}
+]
+```
+第二步，从上一步匹配到 歌曲信息中获取到 id ，然后请求 API Fallback URL + '?types=url&source=joox&id={$id}' 来获取查询到歌曲播放链接
+```
+{
+    "url":"",
+    "br": 320,
+    "size": 9076031,
+    "from":"xx"
+}
+```
+第三步，上一步返回 url依旧为空，需要提示用户暂无播放权限就行
 
 # Search Module
 
